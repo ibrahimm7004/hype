@@ -1,49 +1,31 @@
 # Hype Radar
 
-## Introduction  
+## Introduction
+
 Hype Radar is a powerful social media analytics tool designed to help small businesses and influencers optimize their online presence. By leveraging AI-driven insights, Hype Radar identifies trends, analyzes sentiments, and predicts content performance across multiple social media platforms, including Facebook, Instagram, and Twitter.
 
-## Features  
-- **Sentiment Analysis**: Understand how audiences react to posts and brands.  
-- **Trend Identification**: Spot emerging trends to stay ahead of competitors.  
-- **Influencer Discovery**: Identify key influencers for collaboration.  
-- **Post Performance Prediction**: Forecast the success of future posts.  
+## Modules & Features
 
-## MVP: Generation Module  
-Our MVP focuses on AI-powered content generation, allowing users to create social media posts and memes effortlessly. The key components include:
+Hype Radar consists of several key modules designed to streamline social media management and analytics:
 
-### Data Collection & AI Model Training  
-- Scrape and preprocess social media data.  
-- Extract features for meme templates.  
-- Train AI models on marketing-focused content.  
+- **Generation Module**: Empowers users to generate engaging social media content, including textual posts and memes. Using AI-driven models, it creates high-quality content that aligns with current trends and audience preferences.
 
-### User Input Handling  
-- Accepts structured and free-form inputs.  
-- Extracts keywords and identifies user intent.  
-- Offers text and meme generation options.  
+- **Campaign Management**: Facilitates automated social media posting and scheduling. Users can schedule posts at specific intervals, ensuring optimal engagement. Additionally, this module leverages audience analytics to determine the best times for posting and can automate content publication based on audience activity trends.
 
-### Template Matching Algorithm  
-- Compares input with meme datasets.  
-- Matches structured data and keywords.  
-- Scores and ranks the best meme templates.  
+- **Trend Analytics**: Provides deep insights into user accounts and page performance. Through interactive and dynamic charts, users can track engagement, audience growth, and post effectiveness, helping them refine their social media strategies.
 
-### AI Model Fine-Tuning  
-- Collects and prepares fine-tuning datasets.  
-- Improves AI-generated captions and meme text.  
+## Architecture Diagram
 
-### Meme & Text Generation  
-- Uses AI to generate meme text and captions.  
-- Applies text to selected templates via a Meme Generator API.  
+Here’s an overview of how Hype Radar works:
 
-### User Approval & Storage  
-- Allows users to review and approve generated content.  
-- Stores content for future use.  
-- Prepares content for automated posting.  
+![Hype Radar Diagram](assets/diagram.png)
 
-## Roadmap  
-Upcoming features will expand functionality with campaign management, automated scheduling, and deeper engagement analytics.  
+## Roadmap
 
-## Getting Started  
+Upcoming features will expand functionality with deeper engagement analytics and enhanced automation capabilities.
+
+## Getting Started
+
 1. Clone this repository:
    ```sh
    git clone https://github.com/your-repo/hype-radar.git
@@ -58,12 +40,14 @@ Upcoming features will expand functionality with campaign management, automated 
    npm start  # or python app.py
    ```
 
-## Contributing  
-We welcome contributions! Feel free to submit issues, feature requests, and pull requests.  
+## Contributing
 
-## License  
-This project is licensed under the MIT License.  
+We welcome contributions! Feel free to submit issues, feature requests, and pull requests.
+
+## License
+
+This project is licensed under the MIT License.
 
 ---
-Stay tuned for updates and new features in future releases! 🚀
 
+Stay tuned for updates and new features in future releases! 🚀
