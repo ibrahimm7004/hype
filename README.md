@@ -6,23 +6,23 @@ Hype Radar is a powerful social media analytics tool designed to help small busi
 
 ## Modules & Features
 
-Hype Radar consists of several key modules designed to streamline social media management and analytics:
+Hype Radar consists of 3 key modules designed to streamline social media marketing and analytics:
 
-- **Generation Module**: Empowers users to generate engaging social media content, including textual posts and memes. Using AI-driven models, it creates high-quality content that aligns with current trends and audience preferences.
+- **1: Generation Module**: Empowers users to generate engaging social media content, including textual posts and memes. Using AI-driven models, it creates high-quality content that aligns with current trends and audience preferences.
 
-- **Campaign Management**: Facilitates automated social media posting and scheduling. Users can schedule posts at specific intervals, ensuring optimal engagement. Additionally, this module leverages audience analytics to determine the best times for posting and can automate content publication based on audience activity trends.
+- **2: Campaign Management**: Facilitates automated social media posting and scheduling. Users can schedule posts at specific intervals, ensuring optimal engagement. Additionally, this module leverages audience analytics to determine the best times for posting and can automate content publication based on audience activity trends.
 
-- **Trend Analytics**: Provides deep insights into user accounts and page performance. Through interactive and dynamic charts, users can track engagement, audience growth, and post effectiveness, helping them refine their social media strategies.
+- **3: Trend Analytics**: Provides deep insights into user accounts and page performance. Through interactive and dynamic charts, users can track engagement, audience growth, and post effectiveness, helping them refine their social media strategies.
 
 ## Architecture Diagram
 
-Here’s an overview of how Hype Radar works:
+Here’s an overview of how the **Generation Module** works:
 
 ![Hype Radar Diagram](assets/diagram-1.png)
 
 ## Roadmap
 
-Upcoming features will expand functionality with deeper engagement analytics and enhanced automation capabilities.
+Upcoming features will expand functionality using Modules 2 and 3.
 
 ## Getting Started
 
@@ -39,15 +39,5 @@ Upcoming features will expand functionality with deeper engagement analytics and
    ```sh
    npm start  # or python app.py
    ```
-
-## Contributing
-
-We welcome contributions! Feel free to submit issues, feature requests, and pull requests.
-
-## License
-
-This project is licensed under the MIT License.
-
----
 
 Stay tuned for updates and new features in future releases! 🚀
