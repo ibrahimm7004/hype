@@ -6,7 +6,11 @@ Hype Radar is a powerful social media analytics tool designed to help small busi
 
 ## Modules & Features
 
+<<<<<<< HEAD
 Hype Radar consists of **3 key modules** designed to streamline social media marketing and analytics:
+=======
+Hype Radar consists of 3 key modules designed to streamline social media marketing and analytics:
+>>>>>>> e185e76f54b29b5bde9f71fb8d876fdb198df772
 
 - **1: Generation Module**: Empowers users to generate engaging social media content, including textual posts and memes. Using AI-driven models, it creates high-quality content that aligns with current trends and audience preferences.
 
