@@ -18,7 +18,7 @@ Hype Radar consists of several key modules designed to streamline social media m
 
 Here’s an overview of how Hype Radar works:
 
-![Hype Radar Diagram](assets/diagram.png)
+![Hype Radar Diagram](assets/diagram-1.png)
 
 ## Roadmap
 
