@@ -1,18 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight, FaExpand } from "react-icons/fa";
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-const ImageCarousel = ({ imageUrls }) => {
+const ImageCarousel = ({ imageUrls, setSelectedImage }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedViewImage, setSelectedViewImage] = useState(null);
 
   const prevImage = () => {
+    const index = currentIndex - 1;
+    if (index < 0) index = imgUrls.length - 1;
     setCurrentIndex((prev) => (prev === 0 ? imageUrls.length - 1 : prev - 1));
+    setSelectedImage(imageUrls[index]);
   };
 
   const nextImage = () => {
+    const index = (currentIndex + +1) % imageUrls.length;
     setCurrentIndex((prev) => (prev === imageUrls.length - 1 ? 0 : prev + 1));
+    setSelectedImage(imageUrls[index]);
   };
 
   return (
@@ -38,7 +43,7 @@ const ImageCarousel = ({ imageUrls }) => {
         icon={"fa-expand"}
         size="lg "
         className="absolute right-0 bottom-0 text-white bg-gray-400 p-2 rounded-md cursor-pointer hover:bg-gray-600 transition"
-        onClick={() => setSelectedImage(imageUrls[currentIndex])}
+        onClick={() => setSelectedViewImage(imageUrls[currentIndex])}
       />
 
       {/* Progress Dots */}
@@ -69,13 +74,13 @@ const ImageCarousel = ({ imageUrls }) => {
       </div>
 
       {/* Modal for Expanded View */}
-      {selectedImage && (
+      {selectedViewImage && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70"
-          onClick={() => setSelectedImage(null)}
+          onClick={() => setSelectedViewImage(null)}
         >
           <motion.img
-            src={selectedImage}
+            src={selectedViewImage}
             className="max-w-full max-h-full rounded-xl shadow-xl"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

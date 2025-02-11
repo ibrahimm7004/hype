@@ -22,7 +22,11 @@ const menuItems = [
     icon: <FaHome />,
     path: "/authSocialMedia/twitter/post",
   },
-  { name: "Schedule Post", icon: <FaCalendarAlt />, path: "/schedule-post" },
+  {
+    name: "Schedule Post",
+    icon: <FaCalendarAlt />,
+    path: "/authSocialMedia/twitter/schedule-post",
+  },
   //   {
   //     name: "Analytics",
   //     icon: <FaChartBar />,

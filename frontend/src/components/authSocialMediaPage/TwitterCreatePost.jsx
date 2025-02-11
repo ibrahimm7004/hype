@@ -1,31 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import twitterCallback from "../../utils/twitterCallback";
 
-const TwitterCreatePost = () => {
-  const [tweetText, setTweetText] = useState("");
-  const [image, setImage] = useState(null);
-  const [charCount, setCharCount] = useState(0);
+const TwitterCreatePost = ({ initialText = "", initialImage = "" }) => {
+  const [tweetText, setTweetText] = useState(initialText);
+  const [image, setImage] = useState(null); // Stores the image preview (URL)
+  const [imageFile, setImageFile] = useState(null); // Stores the actual image file
+  const [charCount, setCharCount] = useState(initialText.length);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const MAX_CHAR_COUNT = 280;
 
+  // Function to fetch image from URL and convert it to a File object
+  const fetchImageFromUrl = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob(); // Convert to binary blob
+      const file = new File([blob], "tweet-image.jpg", { type: blob.type }); // Create File object
+      setImage(URL.createObjectURL(blob)); // Preview Image
+      setImageFile(file); // Store File
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    }
+  };
+
+  // Fetch image if initialImage is a URL
+  useEffect(() => {
+    console.log("Initial Image:", initialImage);
+    if (initialImage && initialImage.startsWith("http")) {
+      fetchImageFromUrl(initialImage);
+    }
+  }, [initialImage]);
+
   const handleTweetChange = (e) => {
     const text = e.target.value;
     setTweetText(text);
     setCharCount(text.length);
-    if (text.length > MAX_CHAR_COUNT) {
-      setErrorMessage("Tweet exceeds character limit");
-    } else {
-      setErrorMessage("");
-    }
+    setErrorMessage(
+      text.length > MAX_CHAR_COUNT ? "Tweet exceeds character limit" : ""
+    );
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImage(URL.createObjectURL(file)); // Preview new image
+      setImageFile(file); // Store new file
     }
   };
 
@@ -35,9 +56,8 @@ const TwitterCreatePost = () => {
       try {
         const formData = new FormData();
         formData.append("tweet_text", tweetText);
-        if (image) {
-          const imageFile = document.getElementById("image-upload").files[0];
-          formData.append("image", imageFile);
+        if (imageFile) {
+          formData.append("image", imageFile); // Upload the file (either from URL or user upload)
         }
 
         const oauthToken = localStorage.getItem("oauth_token");
@@ -52,6 +72,7 @@ const TwitterCreatePost = () => {
           setTweetText("");
           setCharCount(0);
           setImage(null);
+          setImageFile(null);
         } else {
           alert("Failed to post tweet");
         }
@@ -66,12 +87,12 @@ const TwitterCreatePost = () => {
   };
 
   return (
-    <div className=" flex items-center justify-center bg-gray-100   mt-10">
+    <div className="flex items-center justify-center bg-gray-100 mt-10">
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white shadow-lg rounded-lg p-16 pb-20 w-1/2 flex"
+        className="bg-white shadow-lg rounded-lg p-16 pb-20  flex"
       >
         {/* Left Side - Info Section */}
         <div className="w-1/3 p-4 flex flex-col justify-center items-center border-r">

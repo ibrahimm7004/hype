@@ -1,24 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import ImageCarousel from "./ImageCarousel";
 import { Twitter, Clock, RefreshCcw, MessageCircle } from "lucide-react";
+import TwitterCreatePost from "../authSocialMediaPage/TwitterCreatePost";
 
-const ImageGallery = ({ imageUrls, setInterfaceState }) => {
-  const [selectedImage, setSelectedImage] = useState(null);
+const ImageGallery = ({
+  imageUrls,
+  setInterfaceState,
+  // setSelectedImage,
+  // selectedImage,
+}) => {
+  const [selectedImage, setSelectedImage] = useState(imageUrls[0]);
+  const [autoPost, setAutoPost] = useState(false);
 
   if (!imageUrls || imageUrls.length === 0) {
     return <p className="text-center text-gray-500">No images available</p>;
   }
 
+  useEffect(() => {
+    console.log("selected img ", selectedImage);
+  }, [selectedImage]);
   const postOptions = [
     {
       label: "Auto Post",
       descritption:
         "Post this image to your Twitter account without any hassle.",
       icon: <Twitter className="w-6 h-6 text-[#1DA1F2]" />,
-      action: () => alert("Posting now..."),
+      action: () => setAutoPost(!autoPost),
       cta: "Post Now",
     },
     {
@@ -49,34 +59,47 @@ const ImageGallery = ({ imageUrls, setInterfaceState }) => {
       {/* Image Grid and Post Options */}
       <div className="flex flex-col md:flex-row w-full max-w-5xl space-y-6 md:space-y-0 md:space-x-8">
         {/* Options Panel */}
-        <motion.div
-          className="flex flex-col w-full space-y-4"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {postOptions.map((option, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center px-4 py-6 bg-white rounded-md shadow-md cursor-pointer hover:shadow-lg transition-all border-l-4 border-[#1DA1F2] w-full"
-              onClick={option.action}
-            >
-              <div className="mr-4">{option.icon}</div>
-              <div className="flex-grow">
-                <p className="font-medium text-gray-900">{option.label}</p>
-                <p className="font-light w-1/2">{option.descritption}</p>
-              </div>
-              {/* <motion.button
+        {!autoPost && (
+          <motion.div
+            className="flex flex-col w-full space-y-4"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            {postOptions.map((option, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center px-4 py-6 bg-white rounded-md shadow-md cursor-pointer hover:shadow-lg transition-all border-l-4 border-[#1DA1F2] w-full"
+                onClick={option.action}
+              >
+                <div className="mr-4">{option.icon}</div>
+                <div className="flex-grow">
+                  <p className="font-medium text-gray-900">{option.label}</p>
+                  <p className="font-light w-1/2">{option.descritption}</p>
+                </div>
+                {/* <motion.button
                 className="px-4 py-2 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#1A91DA] transition"
                 whileHover={{ scale: 1.05 }}
               >
                 {option.cta}
               </motion.button> */}
-            </motion.div>
-          ))}
-        </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+        {autoPost && (
+          <div>
+            <button
+              className="bg-gray-800 text-white rounded-md px-4 py-2"
+              onClick={() => setAutoPost(false)}
+            >
+              Back
+            </button>
+            <TwitterCreatePost initialImage={selectedImage} />
+          </div>
+        )}
 
         {/* Image Carousel */}
         <motion.div
@@ -88,12 +111,12 @@ const ImageGallery = ({ imageUrls, setInterfaceState }) => {
           <ImageCarousel
             imageUrls={imageUrls}
             setSelectedImage={setSelectedImage}
+            selectedImage={selectedImage}
           />
         </motion.div>
       </div>
-
       {/* Modal for Viewing Image */}
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {selectedImage && (
           <motion.div
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 backdrop-blur-sm"
@@ -123,7 +146,7 @@ const ImageGallery = ({ imageUrls, setInterfaceState }) => {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
     </div>
   );
 };
