@@ -4,6 +4,7 @@ import Select from "react-select";
 import fetchData from "../utils/fetchData";
 import { Loader, Palette } from "lucide-react";
 import CustomLoader from "../utils/CustomLoader";
+import MemeTextResults from "../components/aiMarketing/MemeTextResults";
 
 const audienceOptions = [
   "Gen Alpha (Under 13)",
@@ -42,7 +43,7 @@ const MemeTextGenPage = () => {
     type_post: true, // true = Post, false = Poll
     prompt: "",
   });
-
+  const [response, setResponse] = useState("");
   const [isLoading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
@@ -76,7 +77,8 @@ const MemeTextGenPage = () => {
       setLoading(true);
       const response = await fetchData("/ai/meme-gen/text", "POST", formData);
       setLoading(false);
-      alert("Post Generated Successfully!");
+      setResponse(response.data);
+      // alert("Post Generated Successfully!");
       console.log(response.data);
     } catch (error) {
       setLoading(false);
@@ -85,8 +87,17 @@ const MemeTextGenPage = () => {
     }
   };
 
+  const handleRegenerate = () => {
+    setResponse("");
+  };
+
   return isLoading ? (
     <CustomLoader />
+  ) : response ? (
+    <MemeTextResults
+      text={response.results}
+      handleRegenerate={handleRegenerate}
+    />
   ) : (
     <div className="flex flex-col items-center bg-[#F7F9FA] min-h-screen p-6">
       {/* Title */}
@@ -103,7 +114,7 @@ const MemeTextGenPage = () => {
       <div className="bg-white shadow-md rounded-xl p-6 w-full max-w-2xl space-y-6">
         {/* Location Input */}
         <div>
-          <label className="block text-gray-700 font-medium">
+          <label className="block text-gray-700 font-medium ">
             🌍 Location (Optional)
           </label>
           <input
@@ -128,68 +139,73 @@ const MemeTextGenPage = () => {
             className="w-full mt-2 p-3 border rounded-lg"
           />
         </div>
-
-        {/* Audience Type Dropdown */}
-        <div>
-          <label className="block text-gray-700 font-medium">
-            👥 Audience Type
-          </label>
-          <Select
-            isMulti
-            options={audienceOptions}
-            className="mt-2"
-            onChange={(selected) =>
-              handleDropdownChange("audience_type", selected)
-            }
-          />
-        </div>
-
-        {/* CTA Dropdown */}
-        <div>
-          <label className="block text-gray-700 font-medium">
-            🎯 Call To Action
-          </label>
-          <Select
-            isMulti
-            options={ctaOptions}
-            isDisabled={!formData.type_post} // Disable when Poll is selected
-            className="mt-2"
-            onChange={(selected) => handleDropdownChange("CTA", selected)}
-          />
-        </div>
-
-        {/* Trendy Humour Toggle */}
-        <div className="flex items-center justify-between">
-          <span className="text-gray-700 font-medium">🔥 Trendy Humour?</span>
-          <button
-            onClick={() => handleToggle("trendy_humour")}
-            className={`w-16 h-8 flex items-center rounded-full transition-all duration-300 ${
-              formData.trendy_humour ? "bg-green-500" : "bg-gray-400"
-            }`}
-          >
-            <motion.div
-              className="w-6 h-6 bg-white rounded-full shadow-md"
-              animate={{ x: formData.trendy_humour ? 24 : 0 }}
+        <div className="flex justify-between">
+          {/* Audience Type Dropdown */}
+          <div>
+            <label className="block text-gray-700 font-medium">
+              👥 Audience Type
+            </label>
+            <Select
+              isMulti
+              options={audienceOptions}
+              className="mt-2 w-64"
+              onChange={(selected) =>
+                handleDropdownChange("audience_type", selected)
+              }
             />
-          </button>
+          </div>
+
+          {/* CTA Dropdown */}
+          <div>
+            <label className="block text-gray-700 font-medium">
+              🎯 Call To Action
+            </label>
+            <Select
+              isMulti
+              options={ctaOptions}
+              isDisabled={!formData.type_post} // Disable when Poll is selected
+              className="mt-2 w-64"
+              onChange={(selected) => handleDropdownChange("CTA", selected)}
+            />
+          </div>
         </div>
 
-        {/* Type of Post Toggle */}
-        <div className="flex items-center justify-between">
-          <span className="text-gray-700 font-medium">
-            📢 Post Type: {formData.type_post ? "Post" : "Poll"}
-          </span>
-          <button
-            onClick={() => handleToggle("type_post")}
-            className={`w-16 h-8 flex items-center rounded-full transition-all duration-300 ${
-              formData.type_post ? "bg-blue-500" : "bg-yellow-500"
-            }`}
-          >
-            <motion.div
-              className="w-6 h-6 bg-white rounded-full shadow-md"
-              animate={{ x: formData.type_post ? 24 : 0 }}
-            />
-          </button>
+        <div className="flex justify-between">
+          {/* Trendy Humour Toggle */}
+          <div className="flex items-center justify-between">
+            <span className="text-gray-700 font-medium mr-4">
+              🔥 Trendy Humour?
+            </span>
+            <button
+              onClick={() => handleToggle("trendy_humour")}
+              className={`w-16 h-8 flex items-center rounded-full transition-all duration-300 ${
+                formData.trendy_humour ? "bg-green-500" : "bg-gray-400"
+              }`}
+            >
+              <motion.div
+                className="w-6 h-6 bg-white rounded-full shadow-md"
+                animate={{ x: formData.trendy_humour ? 24 : 0 }}
+              />
+            </button>
+          </div>
+
+          {/* Type of Post Toggle */}
+          <div className="flex items-center justify-between">
+            <span className="text-gray-700 font-medium mr-4">
+              📢 Post Type: {formData.type_post ? "Post" : "Poll"}
+            </span>
+            <button
+              onClick={() => handleToggle("type_post")}
+              className={`w-16 h-8 flex items-center rounded-full transition-all duration-300 ${
+                formData.type_post ? "bg-blue-500" : "bg-yellow-500"
+              }`}
+            >
+              <motion.div
+                className="w-6 h-6 bg-white rounded-full shadow-md"
+                animate={{ x: formData.type_post ? 24 : 0 }}
+              />
+            </button>
+          </div>
         </div>
 
         {/* Prompt Input */}

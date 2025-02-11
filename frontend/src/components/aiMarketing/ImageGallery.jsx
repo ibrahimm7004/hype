@@ -5,7 +5,7 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import ImageCarousel from "./ImageCarousel";
 import { Twitter, Clock, RefreshCcw, MessageCircle } from "lucide-react";
 
-const ImageGallery = ({ imageUrls }) => {
+const ImageGallery = ({ imageUrls, setInterfaceState }) => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   if (!imageUrls || imageUrls.length === 0) {
@@ -32,7 +32,7 @@ const ImageGallery = ({ imageUrls }) => {
       label: "Re-Enter Prompt",
       descritption: "You can re-enter the prompt to generate a new image.",
       icon: <RefreshCcw className="w-6 h-6 text-green-500" />,
-      action: () => alert("Re-entering prompt..."),
+      action: () => setInterfaceState("textPrompt"),
       cta: "Edit Prompt",
     },
     {
