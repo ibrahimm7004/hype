@@ -38,6 +38,9 @@ const TwitterCallback = () => {
           console.log("Profile (Twitter Callback):", profile);
 
           setResponse(res); // Store response in state
+
+          // Redirect to Twitter Profile Page
+          window.location.href = "/authSocialMedia/twitter";
         } else {
           console.error("Missing required parameters in URL");
         }
@@ -51,12 +54,19 @@ const TwitterCallback = () => {
 
   return (
     <div>
-      <h1>Twitter OAuth Callback</h1>
       {oauthToken && oauthVerifier ? (
+        // <div>
+        //   <p>OAuth Token: {oauthToken}</p>
+        //   <p>OAuth Verifier: {oauthVerifier}</p>
+        //   {response && <pre>{JSON.stringify(response, null, 2)}</pre>}
+        // </div>
         <div>
-          <p>OAuth Token: {oauthToken}</p>
-          <p>OAuth Verifier: {oauthVerifier}</p>
-          {response && <pre>{JSON.stringify(response, null, 2)}</pre>}
+          <p className="font-semibold mx-auto my-10 text-center">
+            Twitter OAuth Successful!
+          </p>
+          <p className="animate-pulse text-lg mx-auto my-10 text-center">
+            Redirecting...
+          </p>
         </div>
       ) : (
         <BubbleAnimation />
