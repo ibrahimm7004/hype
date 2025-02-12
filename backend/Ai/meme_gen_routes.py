@@ -18,10 +18,9 @@ def generate_meme():
     print("Generating meme...")
 
 
-    meme_image_paths=['/static/generated-memes/But-Thats-None-Of-My-Business_meme.jpg', '/static/generated-memes/Drunk-Baby_meme.jpg', '/static/generated-memes/Chef-Gordon-Ramsay_meme.jpg']
+    meme_image_paths=[]
     meme_urls = [url_for('static', filename=f'generated-memes/{os.path.basename(path)}', _external=True) for path in meme_image_paths]
 
-    return jsonify({"message": "Memes generated", "image_urls": meme_urls}), 200
     
     data = request.get_json()
     
