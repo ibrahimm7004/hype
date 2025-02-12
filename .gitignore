@@ -43,5 +43,4 @@ backend/.env
 backend/flask_session
 backend/.venv
 backend/__pycache__
-backend/Ai/
 backend/Ai/M2_meme_gen/images-meme-template
