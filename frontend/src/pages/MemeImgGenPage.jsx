@@ -7,17 +7,13 @@ import ImageGallery from "../components/aiMarketing/ImageGallery";
 import CustomLoader from "../utils/CustomLoader";
 
 const MemeImgGenPage = () => {
-  const [interfaceState, setInterfaceState] = useState("qna");
+  const [interfaceState, setInterfaceState] = useState("textPromt");
   const [promptText, setPromptText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [promptQna, setPromptQna] = useState("");
 
   const [generatePost, setGeneratePost] = useState(null);
-  const [localImgPaths, setLocalImgPaths] = useState([
-    "http://localhost:5000/static/generated-memes/Papa-Fking-John_meme.jpg",
-    "http://localhost:5000/static/generated-memes/Drunk-Baby_meme.jpg",
-    "http://localhost:5000/static/generated-memes/But-Thats-None-Of-My-Business_meme.jpg",
-  ]);
+  const [localImgPaths, setLocalImgPaths] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const generatePostHandler = async () => {

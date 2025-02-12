@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api", // Backend API URL
+  baseURL: "http://65.0.30.234/api", // Backend API URL
 });
 
 // Automatically attach token before every request
