@@ -17,19 +17,16 @@ twitter_bp = Blueprint("twitter", __name__)  # Define the blueprint
 # Load environment variables
 load_dotenv()
 # # Twitter API credentials
-CLIENT_ID = "YLZjvwSgyaw42v0JDRS58YqLA"
-CLIENT_SECRET = "5Cux0uHbZlsk1AaQQa1hyynTJm04EmSzmczz1bWtsXfnRLdqra"
-
 TWITTER_JWT_SECRET = "twitter_secret_key"
 JWT_EXPIRATION = 36000  # 1 hour
 JWT_ALGORITHM = "HS256"
 
-# CLIENT_ID = os.getenv("CLIENT_ID")
-# CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
-# TWITTER_JWT_SECRET = os.getenv("TWITTER_JWT_SECRET")
-# JWT_EXPIRATION = os.getenv("JWT_EXPIRATION")
-# JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+TWITTER_JWT_SECRET = os.getenv("TWITTER_JWT_SECRET")
+JWT_EXPIRATION = os.getenv("JWT_EXPIRATION")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
 # Twitter API endpoints
 REQUEST_TOKEN_URL = "https://api.twitter.com/oauth/request_token"
 AUTHENTICATE_URL = "https://api.twitter.com/oauth/authenticate"
@@ -66,6 +63,8 @@ def twitter_login():
 
     twitter_jwt = jwt.encode(twitter_payload, TWITTER_JWT_SECRET, algorithm=JWT_ALGORITHM)
     
+    twitter_jwt = twitter_jwt.decode("utf-8")
+    
     print("\nTwitter JWT login:", twitter_jwt)
 
     auth_url = f"{AUTHENTICATE_URL}?oauth_token={credentials.get('oauth_token')}"
@@ -88,6 +87,7 @@ def callback():
     
     print("auth_header:", auth_header)
     jwt_token = auth_header.split(" ")[1]  # ✅ Extract actual token
+    jwt_token = jwt_token.encode("utf-8")
     print("jwt_token:", jwt_token)
 
     # Decode JWT to get stored OAuth tokens
@@ -125,6 +125,7 @@ def callback():
     }
 
     jwt_token = jwt.encode(payload, TWITTER_JWT_SECRET, algorithm=JWT_ALGORITHM)
+    jwt_token = jwt_token.decode("utf-8")
 
     return jsonify({"message": "Access token received successfully!", "twitter_token": jwt_token})
 
@@ -142,6 +143,7 @@ def profile():
     # print("auth_header:", auth_header)
     jwt_token = auth_header.split(" ")[1]  # ✅ Extract actual token
     print("jwt_token:", jwt_token)
+    jwt_token = jwt_token.encode("utf-8")
 
     # Decode JWT to get stored OAuth tokens
     try:
@@ -177,6 +179,7 @@ def tweet():
     
     # Extract and decode the JWT token to get OAuth tokens
     jwt_token = auth_header.split(" ")[1]  # Extract JWT from authorization header
+    jwt_token = jwt_token.encode("utf-8")
     try:
         decoded_token = jwt.decode(jwt_token, TWITTER_JWT_SECRET, algorithms=[JWT_ALGORITHM])
     except jwt.ExpiredSignatureError:

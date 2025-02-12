@@ -52,16 +52,20 @@ def login():
     # Generate Access & Refresh Tokens
     access_token = create_access_token(identity=str(user.email), expires_delta=timedelta(days=3))
     refresh_token = create_refresh_token(identity=str(user.email), expires_delta=timedelta(days=7))
+    
+    access_token= access_token.decode("utf-8")
+    refresh_token= refresh_token.decode("utf-8")
 
-    return jsonify({"access_token": str(access_token), "refresh_token": str(refresh_token)}), 200
+    return jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200
 
 # Refresh Token Endpoint
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)  # Requires refresh token
 def refresh():
     identity = get_jwt_identity()  # Get user identity from refresh token
-    new_access_token = create_access_token(identity=identity, expires_delta=timedelta(minutes=15))
-
+    new_access_token = create_access_token(identity=identity, expires_delta=timedelta(days=3))
+    
+    new_access_token= new_access_token.decode("utf-8")
     return jsonify({"access_token": new_access_token}), 200
 
 
