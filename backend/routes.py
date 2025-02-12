@@ -50,10 +50,10 @@ def login():
         return jsonify({"error": "Invalid credentials"}), 401
 
     # Generate Access & Refresh Tokens
-    access_token = create_access_token(identity=str(user.email), expires_delta=timedelta(minutes=15))
+    access_token = create_access_token(identity=str(user.email), expires_delta=timedelta(days=3))
     refresh_token = create_refresh_token(identity=str(user.email), expires_delta=timedelta(days=7))
 
-    return jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200
+    return jsonify({"access_token": str(access_token), "refresh_token": str(refresh_token)}), 200
 
 # Refresh Token Endpoint
 @auth_bp.route("/refresh", methods=["POST"])
