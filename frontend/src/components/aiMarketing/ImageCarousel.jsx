@@ -8,14 +8,14 @@ const ImageCarousel = ({ imageUrls, setSelectedImage }) => {
   const [selectedViewImage, setSelectedViewImage] = useState(null);
 
   const prevImage = () => {
-    const index = currentIndex - 1;
+    let index = currentIndex - 1;
     if (index < 0) index = imgUrls.length - 1;
     setCurrentIndex((prev) => (prev === 0 ? imageUrls.length - 1 : prev - 1));
     setSelectedImage(imageUrls[index]);
   };
 
   const nextImage = () => {
-    const index = (currentIndex + +1) % imageUrls.length;
+    let index = (currentIndex + +1) % imageUrls.length;
     setCurrentIndex((prev) => (prev === imageUrls.length - 1 ? 0 : prev + 1));
     setSelectedImage(imageUrls[index]);
   };
