@@ -22,7 +22,7 @@ OPTION_SETS = {
 
 def openai_call(meme_template_name, keywords_prompt, structured_inputs):
     prompt = f"""
-    You are an AI meme generator that produces structured meme text for different meme templates. It must be of super dirty, vulgar, mom/dad jokes and below the belt humor. Use roman urdu.
+    You are an AI meme generator that produces structured meme text for different meme templates.
     use abusive words (madarchod, behenchod, chutiyay,loray, lund).
     - Always return the output in **valid JSON format**.
     - Ensure the output follows the specific **meme template's format**.

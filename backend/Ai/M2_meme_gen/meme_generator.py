@@ -43,36 +43,47 @@ memes_df = pd.read_csv('Ai/M2_meme_gen/memes_dataset.csv')
 
 
 def generate_meme_from_json(promptText, promptQna):
+    # Define the expected columns in DataFrame
     user_input_df = pd.DataFrame(columns=[
         "Keywords", "Primary Audience", "Secondary Audience", "Industry",
         "Product/Service", "Best Platforms", "Humor Style", "Emotion Targeted",
         "Engagement Type", "Seasonality", "Tone Alignment"
     ])
-    
 
-    
-
-    # extracting keywords from user prompt
+    # Extracting keywords from user prompt
     keywords = sm1_keyword_extraction.extract_keywords(promptText)
-    # Available attributes from promptQna
+
     # Define expected attributes
-    expected_attributes = [
-        "primary_audience", "secondary_audience", "industry", "product_service",
-        "best_platforms", "humor_style", "emotion_targeted", "engagement_type",
-        "seasonality", "tone_alignment"
-    ]
+    expected_attributes = {
+        "primary_audience": "Primary Audience",
+        "secondary_audience": "Secondary Audience",
+        "industry": "Industry",
+        "product_service": "Product/Service",
+        "best_platforms": "Best Platforms",
+        "humor_style": "Humor Style",
+        "emotion_targeted": "Emotion Targeted",
+        "engagement_type": "Engagement Type",
+        "seasonality": "Seasonality",
+        "tone_alignment": "Tone Alignment"
+    }
 
-    # Ensure 'keywords' column is always present
-    columns = ["Keywords"] + [key for key in expected_attributes if key in promptQna]
+    # Map the attributes from promptQna to match DataFrame column names
+    row_values = [keywords]  # Start with keywords
+    for key in user_input_df.columns[1:]:  # Skip "Keywords" column
+        # Find corresponding key in promptQna (if exists), otherwise set None
+        prompt_key = next((k for k, v in expected_attributes.items() if v == key), None)
+        row_values.append(promptQna.get(prompt_key, None))
 
-    # Ensure the DataFrame has the correct columns
-    # user_input_df = pd.DataFrame(columns=columns)
-
-    # Ensure 'keywords' value is present
-    row_values = [keywords] + [[promptQna.get(key, None)] for key in columns[1:]]
+    # Ensure row_values length matches the number of columns
+    if len(row_values) != len(user_input_df.columns):
+        raise ValueError(f"Column mismatch: Expected {len(user_input_df.columns)}, but got {len(row_values)}")
 
     # Append row safely
     user_input_df.loc[0] = row_values
+
+    # Debugging output
+    print("Final DataFrame Columns:", user_input_df.columns)
+    print("Row Values:", row_values)
 
     # Print for debugging
     print("User Input DataFrame:\n", user_input_df.loc[0])

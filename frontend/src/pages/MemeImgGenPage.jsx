@@ -7,7 +7,7 @@ import ImageGallery from "../components/aiMarketing/ImageGallery";
 import CustomLoader from "../utils/CustomLoader";
 
 const MemeImgGenPage = () => {
-  const [interfaceState, setInterfaceState] = useState("textPromt");
+  const [interfaceState, setInterfaceState] = useState("textPrompt");
   const [promptText, setPromptText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [promptQna, setPromptQna] = useState("");
