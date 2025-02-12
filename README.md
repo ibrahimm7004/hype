@@ -1,27 +1,8 @@
-# 🚀 Vite React App
+# React + Vite
 
-A fast and modern web application built using **Vite**, **React**, and **Tailwind CSS**.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 🌟 Features
+Currently, two official plugins are available:
 
-- ⚡ **Lightning Fast** - Uses Vite for optimized performance.
-- 🎨 **Meme Generation** - AI-powered meme creation.
-- 📊 **Analytics Dashboard** - Track social media engagement.
-- 🔐 **User Authentication** - Secure login & OAuth integration.
-
----
-
-## 📦 Installation & Setup
-
-### 1️⃣ Clone the Repository
-
-```sh
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
-npm install
-# or
-yarn install
-```
-
-VITE_TWITTER_API_KEY=your_api_key_here
-VITE_BACKEND_URL=https://yourbackend.com
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
