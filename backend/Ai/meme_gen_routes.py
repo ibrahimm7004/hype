@@ -53,7 +53,7 @@ def generate_text():
     
     
     
-    expected_data =['location', 'language' ,'trendy_humour', 'type_post', 'prompt']
+    expected_data =['location', 'trendy_language' ,'trendy_humour', 'type_post', 'prompt']
     
     for key in expected_data:
         if key not in data:

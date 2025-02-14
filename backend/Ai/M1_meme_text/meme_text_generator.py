@@ -9,6 +9,9 @@ client = OpenAI(api_key=os.getenv("OPENAI_KEY"))
 
 
 def define_prompt(user_input):
+    
+    print('user input: ',user_input)
+    
     """Creates an improved AI prompt for generating funny marketing tweets."""
     prompt = """
     You are an AI copywriter that writes **viral, humorous Twitter marketing tweets** 
@@ -50,6 +53,8 @@ def define_prompt(user_input):
         - Naturally incorporate this **call-to-action (CTA)** into the joke: {user_input.get('CTA')}.  
         - Do not force the CTA; make it blend naturally into the humor.  
         """
+        
+    print('\n\n\nprompt:',prompt)
 
     return prompt
 
@@ -103,6 +108,7 @@ def meme_text_generator_function (user_input):
     
     print("generating text function...",user_input)
     
+
     
     
     # return "hello"

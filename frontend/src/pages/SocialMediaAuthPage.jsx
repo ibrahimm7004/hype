@@ -98,7 +98,7 @@ const SocialMediaAuthPage = () => {
               </button>
               {platform.id === "twitter" && (
                 <p className="mt-10 font-medium text-slate-600 ">
-                  --- Comming soon! ---
+                  --- Coming soon! ---
                 </p>
               )}
             </div>

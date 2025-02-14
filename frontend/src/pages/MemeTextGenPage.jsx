@@ -36,7 +36,7 @@ const ctaOptions = [
 const MemeTextGenPage = () => {
   const [formData, setFormData] = useState({
     location: "",
-    language: "",
+    trendy_language: "",
     trendy_humour: true,
     audience_type: [],
     CTA: [],
@@ -132,9 +132,9 @@ const MemeTextGenPage = () => {
           <label className="block text-gray-700 font-medium">🗣️ Language</label>
           <input
             type="text"
-            name="language"
+            name="trendy_language"
             placeholder="Enter Language"
-            value={formData.language}
+            value={formData.trendy_language}
             onChange={handleInputChange}
             className="w-full mt-2 p-3 border rounded-lg"
           />
