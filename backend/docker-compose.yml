@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: fyp
+      POSTGRES_USER: talhaimtiaz
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fyp-backend-img  # Naming the image
+    container_name: fyp-backend-container  # Naming the container
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://talhaimtiaz:root@db/fyp
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:

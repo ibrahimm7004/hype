@@ -1,4 +1,4 @@
 docker stop fyp-backend-container
 docker rm fyp-backend-container
 docker build -t fyp-backend .
-docker run -p 5000:5001 --name fyp-backend-container fyp-backend
+docker run -p 8000:5001 --name fyp-backend-container fyp-backend

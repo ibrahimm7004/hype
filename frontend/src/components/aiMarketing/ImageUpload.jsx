@@ -36,7 +36,7 @@ const ImageUpload = () => {
     for (let pair of formData.entries()) {
       console.log(pair[0], pair[1]); // Should print: "file" File { ... }
     }
-    // const result = await fetchData("http://127.0.0.1:5000/cloudinary/upload", "POST", formData, true);
+    // const result = await fetchData("http://127.0.0.1:8000/cloudinary/upload", "POST", formData, true);
     const result = await fetchData("/cloudinary/upload", "POST", formData);
     if (result.error) {
       setMessage(`Upload failed: ${result.error}`);

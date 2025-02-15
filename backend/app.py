@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
+from flask import jsonify
 from config import Config
 from database import db
 from routes import auth_bp, mail
@@ -50,7 +51,13 @@ app.register_blueprint(meme_gen_bp, url_prefix="/api/ai/meme-gen")  # meme_gen r
 # Create Tables
 with app.app_context():
     db.create_all()
+    
+
+#test route 
+@app.route('/hello', methods=['GET'])
+def hello():
+    return jsonify({'message': 'Hello World! 🌍','app': 'Meme Generator API','port': '8000'})
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(host="0.0.0.0", port=8000, debug=True)  # ✅ Correct
 
