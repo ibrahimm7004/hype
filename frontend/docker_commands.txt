@@ -1,0 +1,4 @@
+docker stop fyp-frontend-container
+docker rm fyp-frontend-container
+docker build -t fyp-frontend .
+docker run -p 5173:80 --name fyp-frontend-container fyp-frontend

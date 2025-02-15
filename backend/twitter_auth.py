@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify, redirect, session, url_for
 import requests
 from requests_oauthlib import OAuth1
 from flask_cors import CORS, cross_origin
-import jwt
 import datetime
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
