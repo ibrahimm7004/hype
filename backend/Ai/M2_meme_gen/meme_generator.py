@@ -92,13 +92,10 @@ def generate_meme_from_json(promptText, promptQna):
 
 
     matches_df = sm2_scoring.matching(user_input_df, memes_df)
-    # return
-    
     final_score_table = sm2_scoring.calculate_weighted_scores(matches_df)
     meme_texts = sm3_text_generation.generate_meme_text(
-        final_score_table.iloc[:3], user_input_df, keywords)
+    final_score_table.iloc[:3], user_input_df, keywords)
 
-    print(meme_texts)
 
     meme_output_paths = []
     for key, value in meme_texts.items():
