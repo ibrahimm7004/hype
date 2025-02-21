@@ -33,26 +33,23 @@ const App = () => (
       {/* Landing Page */}
       <Route path="/" element={<LandingPage />} />
 
-      {/* Meme Generator Page */}
-      <Route path="/meme-gen" element={<MemeImgGenPage />} />
-
       {/* Authentication and Dashboard Routes */}
-      <Route path="/authSocialMedia" element={<DashboardLayout />}>
+      <Route path="/social-platform" element={<DashboardLayout />}>
         <Route index element={<SocialMediaAuthPage />} />
         <Route path="callback" element={<TwitterCallback />} />
-        <Route path="twitter" element={<TwitterProfile />} />
-        <Route path="twitter/post" element={<TwitterCreatePost />} />
-        <Route
-          path="twitter/ai-marketing/memeText"
-          element={<MemeTextGenPage />}
-        />
-        <Route
-          path="twitter/ai-marketing/memeImage"
-          element={<MemeImgGenPage />}
-        />
-        <Route path="twitter/schedule-post" element={<SchedulePost />} />
-        <Route path="twitter/ai-marketing" element={<AiMarketing />} />
-        <Route path="twitter/analytics" element={<Anlytics />} />
+        <Route path="twitter">
+          <Route path="" element={<TwitterProfile />} />
+
+          <Route path="schedule-post" element={<SchedulePost />} />
+          <Route path="analytics" element={<Anlytics />} />
+          <Route path="post" element={<TwitterCreatePost />} />
+
+          <Route path="ai-marketing">
+            <Route path="" element={<AiMarketing />} />
+            <Route path="memeText" element={<MemeTextGenPage />} />
+            <Route path="memeImage" element={<MemeImgGenPage />} />
+          </Route>
+        </Route>
       </Route>
 
       {/* User Account Routes */}

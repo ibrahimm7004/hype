@@ -40,7 +40,7 @@ const TwitterCallback = () => {
           setResponse(res); // Store response in state
 
           // Redirect to Twitter Profile Page
-          window.location.href = "/authSocialMedia/twitter";
+          window.location.href = "/social-platform/twitter";
         } else {
           console.error("Missing required parameters in URL");
         }

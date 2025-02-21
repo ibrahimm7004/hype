@@ -43,7 +43,7 @@ const Navbar = () => {
           Home
         </NavLink>
         {/* <NavLink
-          to="/authSocialMedia"
+          to="/social-platform"
           className={({ isActive }) =>
             isActive ? "text-blue-600 font-bold" : linksStyle
           }
@@ -60,7 +60,7 @@ const Navbar = () => {
         </NavLink>
         {userLoggedIn ? (
           <NavLink
-            to="/authSocialMedia/twitter"
+            to="/social-platform/twitter"
             className={({ isActive }) =>
               isActive ? "text-blue-600 font-bold" : linksStyle
             }

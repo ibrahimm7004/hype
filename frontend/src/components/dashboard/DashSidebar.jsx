@@ -14,28 +14,28 @@ const menuItems = [
   {
     name: "Social Profile",
     icon: <FaUser />,
-    path: "/authSocialMedia/twitter",
+    path: "/social-platform/twitter",
   },
-  { name: "Authenticate", icon: <FaLock />, path: "/authSocialMedia" },
+  { name: "Authenticate", icon: <FaLock />, path: "/social-platform" },
   {
     name: "Create Post",
     icon: <FaHome />,
-    path: "/authSocialMedia/twitter/post",
+    path: "/social-platform/twitter/post",
   },
   {
     name: "Schedule Post",
     icon: <FaCalendarAlt />,
-    path: "/authSocialMedia/twitter/schedule-post",
+    path: "/social-platform/twitter/schedule-post",
   },
   //   {
   //     name: "Analytics",
   //     icon: <FaChartBar />,
-  //     path: "/authSocialMedia/twitter/analytics",
+  //     path: "/social-platform/twitter/analytics",
   //   },
   {
     name: "AI Marketing",
     icon: <FaRobot />,
-    path: "/authSocialMedia/twitter/ai-marketing",
+    path: "/social-platform/twitter/ai-marketing",
   },
 ];
 
