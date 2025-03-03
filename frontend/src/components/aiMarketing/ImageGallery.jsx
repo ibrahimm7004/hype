@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import ImageCarousel from "./ImageCarousel";
 import { Twitter, Clock, RefreshCcw, MessageCircle } from "lucide-react";
-import TwitterCreatePost from "../authSocialMediaPage/TwitterCreatePost";
+import TwitterCreatePost from "../SocialPlatformPage/TwitterCreatePost";
 
 const ImageGallery = ({
   imageUrls,

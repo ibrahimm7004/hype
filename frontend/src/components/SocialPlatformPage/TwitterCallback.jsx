@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import React from "react";
 import twitterCallback from "../../utils/twitterCallback";
 import BubbleAnimation from "./BubbleAnimation";
+import fetchData from "../../utils/fetchData";
 
 const TwitterCallback = () => {
   const [oauthToken, setOauthToken] = useState(null);
@@ -11,6 +12,7 @@ const TwitterCallback = () => {
   useEffect(() => {
     const fetchTwitterCallback = async () => {
       try {
+        // http://localhost:5173/social-platform/callback?oauth_token=Lz2oOQAAAAABystQAAABlV2xNd0&oauth_verifier=t2mB6Rz7L7fvAi4KSae5wk2qmRze3rzO
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get("oauth_token");
         const verifier = urlParams.get("oauth_verifier");
@@ -22,20 +24,20 @@ const TwitterCallback = () => {
           console.log("url", window.location.search);
 
           // Await the API call
-          const res = await twitterCallback(
+          const res = await fetchData(
             `/twitter/callback?oauth_token=${token}&oauth_verifier=${verifier}`,
             "GET"
           );
 
-          localStorage.setItem("twitter_jwt_token", res.data.twitter_token);
+          // localStorage.setItem("twitter_jwt_token", res.data.twitter_token);
 
-          console.log("Response (Twitter Callback):", res);
-          const profile = await twitterCallback(
-            `/twitter/profile?oauth_token=${token}&oauth_verifier=${verifier}`,
-            "GET"
-          );
+          // console.log("Response (Twitter Callback):", res);
+          // const profile = await twitterCallback(
+          //   `/twitter/profile?oauth_token=${token}&oauth_verifier=${verifier}`,
+          //   "GET"
+          // );
 
-          console.log("Profile (Twitter Callback):", profile);
+          // console.log("Profile (Twitter Callback):", profile);
 
           setResponse(res); // Store response in state
 

@@ -50,6 +50,38 @@ const TwitterCreatePost = ({ initialText = "", initialImage = "" }) => {
     }
   };
 
+  const handleScheduleTweet = async () => {
+    if (tweetText.length <= MAX_CHAR_COUNT && tweetText.length > 0) {
+      setLoading(true);
+
+      let hasText = Boolean(tweetText.trim());
+      let hasImage = Boolean(imageFile);
+
+      if (hasImage) {
+        const reader = new FileReader();
+        reader.readAsDataURL(imageFile);
+        reader.onload = () => {
+          const imageBase64 = reader.result; // Convert image to Base64
+          localStorage.setItem("scheduled_tweet_image", imageBase64);
+          localStorage.setItem("scheduled_tweet_text", tweetText);
+
+          // Redirect with flags only
+          window.location.href = `/social-platform/twitter/schedule-post?has_text=${hasText}&has_image=${hasImage}`;
+        };
+      } else {
+        localStorage.setItem("scheduled_tweet_text", tweetText);
+        localStorage.removeItem("scheduled_tweet_image"); // Remove old image if none is uploaded
+
+        // Redirect with flags only
+        window.location.href = `/social-platform/twitter/schedule-post?has_text=${hasText}&has_image=${hasImage}`;
+      }
+
+      setLoading(false);
+    } else {
+      alert("Please write a valid tweet");
+    }
+  };
+
   const handlePostTweet = async () => {
     if (tweetText.length <= MAX_CHAR_COUNT && tweetText.length > 0) {
       setLoading(true);
@@ -173,7 +205,26 @@ const TwitterCreatePost = ({ initialText = "", initialImage = "" }) => {
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end">
+          <div className="mt-6 flex justify-end gap-x-4">
+            <motion.button
+              onClick={handleScheduleTweet}
+              disabled={
+                tweetText.length === 0 ||
+                tweetText.length > MAX_CHAR_COUNT ||
+                loading
+              }
+              className={`px-6 py-1 rounded-full font-semibold transition-all border-[1px] bg-white
+                  ${
+                    tweetText.length > 0 &&
+                    tweetText.length <= MAX_CHAR_COUNT &&
+                    !loading
+                      ? "border-black hover:text-white hover:bg-black"
+                      : "text-gray-400 border-gray-400 cursor-not-allowed"
+                  }`}
+              whileTap={{ scale: 0.95 }}
+            >
+              {loading ? "Scheduling..." : "Schedule"}
+            </motion.button>
             <motion.button
               onClick={handlePostTweet}
               disabled={
@@ -181,7 +232,7 @@ const TwitterCreatePost = ({ initialText = "", initialImage = "" }) => {
                 tweetText.length > MAX_CHAR_COUNT ||
                 loading
               }
-              className={`px-6 py-2 rounded-full text-white font-semibold transition-all
+              className={`px-6 py-1 rounded-full text-white font-semibold transition-all
                 ${
                   tweetText.length > 0 &&
                   tweetText.length <= MAX_CHAR_COUNT &&

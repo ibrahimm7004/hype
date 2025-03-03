@@ -2,12 +2,12 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from flask import jsonify
-from config import Config
-from database import db
-from routes import auth_bp, mail
+from mydatabase.config import Config
+from mydatabase.database import db
+from routes.user_routes import auth_bp, mail
 from flask_cors import CORS
-from twitter_auth import twitter_bp  # Import the blueprint
-from cloudinary_routes import cloudinary_bp  # Import the blueprint
+from routes.twitter_auth import twitter_bp  # Import the blueprint
+from routes.cloudinary_routes import cloudinary_bp  # Import the blueprint
 from datetime import timedelta
 from Ai.meme_gen_routes import meme_gen_bp  # Import the blueprint
 from flask_session import Session

@@ -29,6 +29,7 @@ const UserLogin = () => {
         setMessage("Login successful! 🎉 Redirecting...");
         localStorage.setItem("access_token", data.access_token);
         localStorage.setItem("refresh_token", data.refresh_token);
+        localStorage.setItem("user_id", data.user_id);
         // console.log("access_token", data.access_token);
         setTimeout(() => {
           window.location.href = "/"; // Redirect after login
@@ -121,7 +122,7 @@ const UserLogin = () => {
         {/* Register Redirect */}
         <p className="text-center text-sm text-gray-600 mt-4">
           Don't have an account?{" "}
-          <a href="/register" className="text-blue-500 hover:underline">
+          <a href="/user/register" className="text-blue-500 hover:underline">
             Register here
           </a>
         </p>

@@ -44,21 +44,43 @@ const SocialMediaAuthPage = () => {
 
   const handleAuth = async (platform) => {
     try {
-      const response = await fetchData(`/${platform.id}/login`, "GET");
+      const user_id = localStorage.getItem("user_id");
+      if (!user_id) {
+        window.location.href = "/user/login";
+        alert("Please login first");
+        return;
+      }
+
+      const response = await fetchData(
+        `/${platform.id}/login`,
+        "POST",
+        JSON.stringify({
+          user_id: user_id,
+        })
+      );
       console.log(`Response login Platform ${platform.id}:`, response);
 
       // Save the token in local storage
-      localStorage.setItem(
-        `${platform.id}_jwt_token`,
-        response.data.twitter_token
-      );
-      localStorage.setItem("oauth_token", response.data.oauth_token);
+      // localStorage.setItem(
+      //   `${platform.id}_jwt_token`,
+      //   response.data.twitter_token
+      // );
+      // localStorage.setItem("oauth_token", response.data.oauth_token);
 
       // Redirect to authentication URL
       window.location.href = response.data.auth_url;
     } catch (err) {
       console.log("Error logging in:", err);
     }
+  };
+
+  const handleRevoke = (platformId) => {
+    localStorage.removeItem(`${platformId}_jwt_token`);
+    localStorage.removeItem("oauth_token");
+    setAuthenticatedPlatforms((prev) => ({
+      ...prev,
+      [platformId]: false,
+    }));
   };
 
   return (
@@ -74,19 +96,13 @@ const SocialMediaAuthPage = () => {
 
         <div className="mt-6 space-y-4 w-full">
           {platforms.map((platform) => (
-            <div>
+            <div
+              key={platform.id}
+              className="flex justify-between items-center"
+            >
               <button
-                key={platform.id}
                 onClick={() => handleAuth(platform)}
-                disabled={authenticatedPlatforms[platform.id]} // Disable if already authenticated
-                className={`
-                flex items-center justify-center w-full text-white font-medium py-3 rounded-lg shadow-md transition-transform transform hover:scale-105
-                ${
-                  authenticatedPlatforms[platform.id]
-                    ? "opacity-50 cursor-not-allowed border-4 border-slate-800"
-                    : ""
-                }
-                    `}
+                className={`flex items-center justify-center w-full text-white font-medium py-3 rounded-lg shadow-md transition-transform transform hover:scale-105`}
                 style={{ backgroundColor: platform.color }}
               >
                 {platform.icon}
@@ -96,10 +112,13 @@ const SocialMediaAuthPage = () => {
                     : `Authenticate with ${platform.name}`}
                 </span>
               </button>
-              {platform.id === "twitter" && (
-                <p className="mt-10 font-medium text-slate-600 ">
-                  --- Coming soon! ---
-                </p>
+              {authenticatedPlatforms[platform.id] && (
+                <button
+                  onClick={() => handleRevoke(platform.id)}
+                  className="ml-2 px-3 py-1 bg-red-600 text-white text-xs rounded shadow-md hover:bg-red-700 transition"
+                >
+                  Revoke
+                </button>
               )}
             </div>
           ))}

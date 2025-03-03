@@ -17,6 +17,8 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "axios": "^1.7.3",
     "chart.js": "^4.4.7",
+    "data-fns": "^1.1.0",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.18.2",
     "html2canvas": "^1.4.1",

@@ -2,8 +2,8 @@ from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_mail import Message, Mail
-from database import db
-from models import User
+from mydatabase.database import db
+from mydatabase.models import User
 import secrets
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import (
@@ -50,13 +50,14 @@ def login():
         return jsonify({"error": "Invalid credentials"}), 401
 
     # Generate Access & Refresh Tokens
-    access_token = create_access_token(identity=str(user.email), expires_delta=timedelta(days=3))
-    refresh_token = create_refresh_token(identity=str(user.email), expires_delta=timedelta(days=7))
+    access_token = create_access_token(identity=str(user.user_id), expires_delta=timedelta(days=3))
+    refresh_token = create_refresh_token(identity=str(user.user_id), expires_delta=timedelta(days=7))
+    user_id = user.user_id
     
     # access_token= access_token.decode("utf-8")
     # refresh_token= refresh_token.decode("utf-8")
 
-    return jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200
+    return jsonify({"access_token": access_token, "refresh_token": refresh_token, "user_id":user_id}), 200
 
 # Refresh Token Endpoint
 @auth_bp.route("/refresh", methods=["POST"])
