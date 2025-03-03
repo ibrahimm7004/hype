@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import twitterCallback from "../../utils/twitterCallback";
+import fetchData from "../../utils/fetchData";
 
 const TwitterCreatePost = ({ initialText = "", initialImage = "" }) => {
   const [tweetText, setTweetText] = useState(initialText);
@@ -92,12 +93,8 @@ const TwitterCreatePost = ({ initialText = "", initialImage = "" }) => {
           formData.append("image", imageFile); // Upload the file (either from URL or user upload)
         }
 
-        const oauthToken = localStorage.getItem("oauth_token");
-        const response = await twitterCallback(
-          `/twitter/tweet?oauth_token=${oauthToken}`,
-          "POST",
-          formData
-        );
+        // const oauthToken = localStorage.getItem("oauth_token");
+        const response = await fetchData(`/twitter/tweet`, "POST", formData);
 
         if (response && response.status === 200) {
           alert("Tweet posted successfully!");

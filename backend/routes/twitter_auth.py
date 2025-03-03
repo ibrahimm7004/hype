@@ -228,80 +228,105 @@ def profile():
     user_data = response.json()
     return jsonify({"user": user_data})
 
-@twitter_bp.route("/tweet", methods=["POST"])
-def tweet():
-    """Post a tweet with an optional image"""
-    oauth_token = request.args.get("oauth_token")
-    auth_header = request.headers.get("Authorization")
-    
-    tweet_text = request.form.get("tweet_text")
-    image_file = request.files.get("image")  # Get the image file from the form
-    
-    if not oauth_token or not auth_header:
-        return jsonify({"error": "Missing credentials"}), 400
-    
-    # Extract and decode the JWT token to get OAuth tokens
-    jwt_token = auth_header.split(" ")[1]  # Extract JWT from authorization header
-    jwt_token = jwt_token.encode("utf-8")
-    try:
-        # decoded_token = jwt.decode(jwt_token, TWITTER_JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        decoded_token = get_jwt_identity()
-    except Exception as e:
-        return jsonify({"error": str(e)}), 401
-    # except jwt.ExpiredSignatureError:
-    #     return jsonify({"error": "Token expired. Please login again."}), 401
-    # except jwt.InvalidTokenError:
-    #     return jsonify({"error": "Invalid token"}), 401
 
-    # OAuth1 for Twitter API authentication
+
+def post_tweet(decoded_token, tweet_text, image_file, access_token, access_token_secret):
+    """Handles posting a tweet with an optional image"""
+
     oauth = OAuth1(
         CLIENT_ID, CLIENT_SECRET,
-        decoded_token["access_token"], decoded_token["access_token_secret"]
+        access_token,access_token_secret
     )
-    
-    print("decoded_token:", decoded_token)
+
+    media_id = None
 
     # Check if an image was uploaded
-    media_id = None
     if image_file:
         print("Media file is present\n")
+
         # Secure and save the image temporarily
         filename = secure_filename(image_file.filename)
         image_path = f"/tmp/{filename}"
         image_file.save(image_path)
-        
+
         # Upload image to Twitter Media Upload endpoint
         with open(image_path, 'rb') as image:
             media_data = {'media': image}
             media_response = requests.post(UPLOAD_MEDIA_URL, auth=oauth, files=media_data)
-            
+
             if media_response.status_code == 200:
                 media_id = media_response.json().get("media_id_string")
-                print("Media Upload Successful (Media ID):", media_id)    
+                print("Media Upload Successful (Media ID):", media_id)
             else:
                 return jsonify({"error": "Failed to upload image."}), 400
+
+        # Remove temporary file
+        os.remove(image_path)
+
     else:
         print("No media file is present\n")
-        
-        
+
     # Create payload for posting the tweet
     payload = {"text": tweet_text}
-    print("request", request.data)
-    print("fomr data:", dict(request.form))
-    # return jsonify({"message": "Tweet posted successfully!"}),200
     if media_id:
-        payload["media"]= {"media_ids": [media_id]}  # Attach media_id if available
-    
+        payload["media"] = {"media_ids": [media_id]}  # Attach media_id if available
+
     print("Payload:", payload)
+
     # Post the tweet
     headers = {"Content-Type": "application/json"}
     response = requests.post(POST_TWEET_URL, auth=oauth, json=payload, headers=headers)
 
     # Check if tweet was successfully posted
     if response.status_code == 201:
-        return jsonify({"message": "Tweet posted successfully!"})
+        return jsonify({"message": "Tweet posted successfully!"}), 200
 
     return jsonify({"error": response.text}), 400
+
+
+def get_twitter_auth_from_user_id(user_id):
+    """Get Twitter OAuth tokens from user ID"""
+    user_token = UserToken.query.filter_by(user_id=user_id).first()
+
+    if not user_token:
+        return None
+
+    return{
+        "access_token": user_token.oauth_token, 
+        "access_token_secret": user_token.oauth_token_secret
+    }
+
+@twitter_bp.route("/tweet", methods=["POST"])
+@jwt_required()
+def tweet():
+    """Post a tweet with an optional image"""
+
+    # oauth_token = request.args.get("oauth_token")
+    auth_header = request.headers.get("Authorization")
+
+    tweet_text = request.form.get("tweet_text")
+    image_file = request.files.get("image")  # Get the image file from the form
+
+    if  not auth_header:
+        return jsonify({"error": "Missing credentials"}), 400
+
+    try:
+        user_id = get_jwt_identity()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 401
+    
+    try:
+        decoded_token = get_twitter_auth_from_user_id(user_id)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    
+    if not decoded_token:
+        return jsonify({"error": "Twitter credentials not found please authenticate your account with api"}), 400
+    
+    access_token = decoded_token["access_token"]
+    access_token_secret = decoded_token["access_token_secret"]
+    
+    return post_tweet(decoded_token, tweet_text, image_file, access_token, access_token_secret)  # Call the utility function
 
 
 @twitter_bp.route("/schedule-tweet", methods=["POST"])
@@ -331,21 +356,21 @@ def schedule_tweet():
         return jsonify({"error": "Invalid datetime format"}), 400
 
     print("Scheduled Time:", scheduled_time)
-    # if scheduled_time < datetime.now():
-    #     return jsonify({"error": "Scheduled time must be in the future"}), 400
+    if scheduled_time < datetime.now():
+        return jsonify({"error": "Scheduled time must be in the future"}), 400
     # Upload image if provided
     image_url = None
-    image_url = 'https://res.cloudinary.com/doh1eotn4/image/upload/v1740178110/zs84nivaopyr5serx6af.png'
-    # if image_file:
+    # image_url = 'https://res.cloudinary.com/doh1eotn4/image/upload/v1740178110/zs84nivaopyr5serx6af.png'
+    if image_file:
         
-    #     try:
-    #         upload_result = cloudinary.uploader.upload(image_file)
-    #         print("Upload Result:", upload_result)
-    #         image_url = upload_result.get("secure_url")
-    #         print("Image URL:", image_url)
-    #     except Exception as e:
-    #         return jsonify({"error": "Failed to upload image to cloudinary"}), 400
-    # return jsonify({"message": "Tweet scheduled successfully!"}), 200
+        try:
+            upload_result = cloudinary.uploader.upload(image_file)
+            print("Upload Result:", upload_result)
+            image_url = upload_result.get("secure_url")
+            print("Image URL:", image_url)
+        except Exception as e:
+            return jsonify({"error": "Failed to upload image to cloudinary"}), 400
+    return jsonify({"message": "Tweet scheduled successfully!"}), 200
         
 
     # Save to database
