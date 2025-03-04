@@ -6,7 +6,7 @@ const SchedulePost = () => {
   return (
     <div>
       <ScheduledTweetsList />
-      {/* <ScheduleTweet /> */}
+      <ScheduleTweet />
     </div>
   );
 };

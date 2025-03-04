@@ -1,20 +1,22 @@
 from flask import Blueprint, request, jsonify, redirect, session, url_for
-import requests
-from requests_oauthlib import OAuth1
-from flask_cors import CORS, cross_origin
-from datetime import timedelta
-from datetime import datetime
-from dotenv import load_dotenv
-from werkzeug.utils import secure_filename
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
     jwt_required,
     get_jwt_identity,get_jwt
 )
+import requests
+
+from requests_oauthlib import OAuth1
+from flask_cors import CORS, cross_origin
+from datetime import timedelta
+from datetime import datetime
+from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
 
 from mydatabase.models import ScheduledTweet, UserToken
 from mydatabase.database import db
+from services.twitter_util import post_tweet, get_twitter_auth_from_user_id
 
 import os
 
@@ -230,71 +232,6 @@ def profile():
 
 
 
-def post_tweet(decoded_token, tweet_text, image_file, access_token, access_token_secret):
-    """Handles posting a tweet with an optional image"""
-
-    oauth = OAuth1(
-        CLIENT_ID, CLIENT_SECRET,
-        access_token,access_token_secret
-    )
-
-    media_id = None
-
-    # Check if an image was uploaded
-    if image_file:
-        print("Media file is present\n")
-
-        # Secure and save the image temporarily
-        filename = secure_filename(image_file.filename)
-        image_path = f"/tmp/{filename}"
-        image_file.save(image_path)
-
-        # Upload image to Twitter Media Upload endpoint
-        with open(image_path, 'rb') as image:
-            media_data = {'media': image}
-            media_response = requests.post(UPLOAD_MEDIA_URL, auth=oauth, files=media_data)
-
-            if media_response.status_code == 200:
-                media_id = media_response.json().get("media_id_string")
-                print("Media Upload Successful (Media ID):", media_id)
-            else:
-                return jsonify({"error": "Failed to upload image."}), 400
-
-        # Remove temporary file
-        os.remove(image_path)
-
-    else:
-        print("No media file is present\n")
-
-    # Create payload for posting the tweet
-    payload = {"text": tweet_text}
-    if media_id:
-        payload["media"] = {"media_ids": [media_id]}  # Attach media_id if available
-
-    print("Payload:", payload)
-
-    # Post the tweet
-    headers = {"Content-Type": "application/json"}
-    response = requests.post(POST_TWEET_URL, auth=oauth, json=payload, headers=headers)
-
-    # Check if tweet was successfully posted
-    if response.status_code == 201:
-        return jsonify({"message": "Tweet posted successfully!"}), 200
-
-    return jsonify({"error": response.text}), 400
-
-
-def get_twitter_auth_from_user_id(user_id):
-    """Get Twitter OAuth tokens from user ID"""
-    user_token = UserToken.query.filter_by(user_id=user_id).first()
-
-    if not user_token:
-        return None
-
-    return{
-        "access_token": user_token.oauth_token, 
-        "access_token_secret": user_token.oauth_token_secret
-    }
 
 @twitter_bp.route("/tweet", methods=["POST"])
 @jwt_required()
@@ -356,8 +293,8 @@ def schedule_tweet():
         return jsonify({"error": "Invalid datetime format"}), 400
 
     print("Scheduled Time:", scheduled_time)
-    if scheduled_time < datetime.now():
-        return jsonify({"error": "Scheduled time must be in the future"}), 400
+    # if scheduled_time < datetime.now():
+    #     return jsonify({"error": "Scheduled time must be in the future"}), 400
     # Upload image if provided
     image_url = None
     # image_url = 'https://res.cloudinary.com/doh1eotn4/image/upload/v1740178110/zs84nivaopyr5serx6af.png'
@@ -370,7 +307,7 @@ def schedule_tweet():
             print("Image URL:", image_url)
         except Exception as e:
             return jsonify({"error": "Failed to upload image to cloudinary"}), 400
-    return jsonify({"message": "Tweet scheduled successfully!"}), 200
+    # return jsonify({"message": "Tweet scheduled successfully!"}), 200
         
 
     # Save to database

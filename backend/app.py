@@ -51,7 +51,6 @@ app.register_blueprint(meme_gen_bp, url_prefix="/api/ai/meme-gen")  # meme_gen r
 # Create Tables
 with app.app_context():
     db.create_all()
-    
 
 #test route 
 @app.route('/hello', methods=['GET'])
