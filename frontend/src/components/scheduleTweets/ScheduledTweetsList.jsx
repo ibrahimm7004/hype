@@ -3,10 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faClock,
-  faImage,
   faCalendar,
   faFilter,
   faChevronDown,
+  faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import fetchData from "../../utils/fetchData";
 import CountdownTimer from "./CountdownTimer";
@@ -31,7 +31,6 @@ const ScheduledTweetsList = () => {
         `/twitter/scheduled-tweets?user_id=${userId}`
       );
       const data = await response.data;
-      console.log("Scheduled Tweets:", data);
       if (response.status === 200) {
         setTweets(data.scheduled_tweets);
       } else {
@@ -48,17 +47,19 @@ const ScheduledTweetsList = () => {
   });
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">Scheduled Tweets</h1>
+    <div className="p-6 max-w-2xl mx-auto">
+      <h1 className="text-2xl font-semibold text-center mb-6">
+        Scheduled Tweets
+      </h1>
 
       {/* Filter Buttons */}
-      <div className="flex justify-center space-x-4 mb-6">
+      <div className="flex justify-center space-x-3 mb-6">
         {["all", "posted", "unposted"].map((status) => (
           <button
             key={status}
-            className={`px-4 py-2 rounded-lg font-semibold ${
-              filter === status ? "bg-blue-600 text-white" : "bg-gray-200"
-            } transition-all duration-300`}
+            className={`px-4 py-2 rounded-md font-medium border border-gray-300 ${
+              filter === status ? "bg-blue-600 text-white" : "bg-white"
+            } transition-all duration-300 shadow-sm`}
             onClick={() => setFilter(status)}
           >
             <FontAwesomeIcon icon={faFilter} className="mr-2" />
@@ -68,7 +69,7 @@ const ScheduledTweetsList = () => {
       </div>
 
       {/* Tweets List */}
-      <div className="w-full space-y-4 px-4">
+      <div className="space-y-4">
         {filteredTweets.length === 0 ? (
           <p className="text-center text-gray-500">
             No scheduled tweets found.
@@ -77,30 +78,31 @@ const ScheduledTweetsList = () => {
           filteredTweets.map((tweet) => (
             <motion.div
               key={tweet.id}
-              className="w-full bg-gray-900 text-white shadow-lg rounded-xl p-4 flex flex-col transition-all duration-300 cursor-pointer"
+              className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white hover:shadow-md transition-all duration-300"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => toggleExpand(tweet.id)}
             >
-              {/* Tweet Header (Always Visible) */}
+              {/* Tweet Header */}
               <div className="flex items-center justify-between">
-                {/* Countdown Timer & Tweet Preview */}
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center justify-between space-x-4">
                   <FontAwesomeIcon
                     icon={faCalendar}
-                    className="text-gray-400 text-lg"
+                    className="text-gray-500"
                   />
-                  <CountdownTimer scheduledTime={tweet.scheduled_time} />
-                  <p className="text-gray-300 text-sm truncate max-w-xs">
+                  <p className="text-gray-700 text-sm truncate max-w-xs">
                     {tweet.tweet_text.length > 50
                       ? tweet.tweet_text.substring(0, 50) + "..."
                       : tweet.tweet_text}
                   </p>
+                  {!tweet.posted && (
+                    <CountdownTimer scheduledTime={tweet.scheduled_time} />
+                  )}
                 </div>
 
                 {/* Expand Icon */}
                 <motion.div
-                  className="cursor-pointer bg-gray-800 p-2 rounded-full hover:bg-gray-700 transition-all"
+                  className="cursor-pointer p-2 rounded-md hover:bg-gray-200 transition-all"
                   whileTap={{ scale: 0.9 }}
                 >
                   <FontAwesomeIcon
@@ -120,14 +122,14 @@ const ScheduledTweetsList = () => {
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="mt-3 border-t border-gray-700 pt-3"
+                    className="mt-3 border-t border-gray-300 pt-3"
                   >
-                    <p className="text-sm text-gray-300">{tweet.tweet_text}</p>
+                    <p className="text-sm text-gray-600">{tweet.tweet_text}</p>
                     {tweet.image_url && (
                       <motion.img
                         src={tweet.image_url}
                         alt="Tweet"
-                        className="w-full h-40 object-cover rounded-lg mt-3"
+                        className="w-full h-40 object-cover rounded-md mt-3"
                         whileHover={{ scale: 1.05 }}
                       />
                     )}
@@ -138,17 +140,17 @@ const ScheduledTweetsList = () => {
               {/* Status & Clock Icon */}
               <div className="flex justify-between items-center mt-3">
                 <span
-                  className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                  className={`px-3 py-1 text-xs font-semibold rounded-md border ${
                     tweet.posted
-                      ? "bg-green-500 text-white"
-                      : "bg-yellow-500 text-gray-900"
+                      ? "bg-green-100 text-green-700 border-green-400"
+                      : "bg-yellow-100 text-yellow-700 border-yellow-400"
                   }`}
                 >
                   {tweet.posted ? "Posted" : "Scheduled"}
                 </span>
                 <FontAwesomeIcon
-                  icon={faClock}
-                  className="text-blue-400 cursor-pointer"
+                  icon={tweet.posted ? faCheck : faClock}
+                  className="text-blue-500 cursor-pointer"
                 />
               </div>
             </motion.div>

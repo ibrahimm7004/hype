@@ -16,10 +16,10 @@ const CountdownTimer = ({ scheduledTime }) => {
   if (timeLeft.total <= 0) {
     return (
       <motion.p
-        className="text-red-500 font-semibold text-lg"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1.2, opacity: 1 }}
-        transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+        className="text-red-400 font-medium text-sm tracking-wide"
+        initial={{ opacity: 0.5 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, repeat: Infinity, repeatType: "reverse" }}
       >
         ⏳ Time Expired!
       </motion.p>
@@ -28,43 +28,34 @@ const CountdownTimer = ({ scheduledTime }) => {
 
   return (
     <motion.div
-      className="flex space-x-2 text-md font-semibold text-white bg-gray-900 p-3 rounded-xl shadow-lg"
-      initial={{ opacity: 0, y: -10 }}
+      className="flex items-center space-x-2 bg-gray-50 text-gray-600 px-3 py-1 rounded-md shadow-sm border-[1px] border-gray-300 w-[180px]"
+      initial={{ opacity: 0, y: -5 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4 }}
     >
-      <FlipNumber value={timeLeft.days} label="Days" />
-      <FlipNumber value={timeLeft.hours} label="Hrs" />
-      <FlipNumber value={timeLeft.minutes} label="Min" />
-      <FlipNumber
+      <TimeBox value={timeLeft.days} label="D" />
+      <TimeBox value={timeLeft.hours} label="H" />
+      <TimeBox value={timeLeft.minutes} label="M" />
+      <TimeBox
         value={timeLeft.seconds}
-        label="Sec"
+        label="S"
         isLastSeconds={timeLeft.total < 10000}
       />
     </motion.div>
   );
 };
-
-const FlipNumber = ({ value, label, isLastSeconds }) => {
+const TimeBox = ({ value, label }) => {
   return (
     <motion.div
-      className={`flex flex-col items-center px-3 py-2 rounded-lg ${
-        isLastSeconds ? "bg-red-500 animate-pulse" : "bg-gray-700"
-      }`}
-      initial={{ rotateX: 0 }}
-      animate={{ rotateX: [0, -90, 0] }}
-      transition={{ duration: 0.7, ease: "easeInOut" }}
+      className="flex flex-col items-center justify-center px-2"
+      initial={{ scale: 1 }}
+      animate={{ scale: [1, 1.1, 1] }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
     >
-      <motion.span
-        className="text-xl font-bold"
-        key={value}
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        {value}
-      </motion.span>
-      <span className="text-xs text-gray-300">{label}</span>
+      <span className="text-md font-semibold text-gray-600">{value}</span>
+      <span className="text-[10px] uppercase tracking-widest text-gray-500">
+        {label}
+      </span>
     </motion.div>
   );
 };

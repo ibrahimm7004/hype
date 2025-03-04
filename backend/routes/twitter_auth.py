@@ -43,22 +43,19 @@ twitter_bp = Blueprint("twitter", __name__)  # Define the blueprint
 load_dotenv()
 # # Twitter API credentials
 TWITTER_JWT_SECRET = "twitter_secret_key"
-JWT_EXPIRATION = 36000  # 1 hour
-JWT_ALGORITHM = "HS256"
+
 
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 TWITTER_JWT_SECRET = os.getenv("TWITTER_JWT_SECRET")
-JWT_EXPIRATION = os.getenv("JWT_EXPIRATION")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+
 # Twitter API endpoints
 REQUEST_TOKEN_URL = "https://api.twitter.com/oauth/request_token"
 AUTHENTICATE_URL = "https://api.twitter.com/oauth/authenticate"
 ACCESS_TOKEN_URL = "https://api.twitter.com/oauth/access_token"
 USER_INFO_URL = "https://api.twitter.com/1.1/account/verify_credentials.json"
-POST_TWEET_URL = "https://api.twitter.com/2/tweets"
-UPLOAD_MEDIA_URL = 'https://upload.twitter.com/1.1/media/upload.json'
+
 
 
 TWITTER_TOKEN_EXPIRATION = 365  # 1 hour
@@ -147,80 +144,26 @@ def callback():
     return jsonify({"message": "Access token saved successfully!"}), 200
 
 
-@twitter_bp.route("/refresh-token", methods=["POST"])
-@jwt_required()
-def refresh_access_token():
-    """Generate a new access token using stored refresh token"""
-    current_user = get_jwt_identity()
-    user_token = UserToken.query.filter_by(user_id=current_user).first()
-
-    if not user_token:
-        return jsonify({"error": "Refresh token not found. Please re-authenticate."}), 401
-
-    # Use stored refresh token to get a new access token
-    oauth = OAuth1(
-        CLIENT_ID, CLIENT_SECRET,
-        resource_owner_key=user_token.refresh_token
-    )
-
-    response = requests.post(ACCESS_TOKEN_URL, auth=oauth)
-
-    if response.status_code != 200:
-        return jsonify({"error": "Failed to refresh access token"}), 400
-
-    credentials = dict(x.split("=") for x in response.text.split("&"))
-
-    # Generate new access token
-    payload = {
-        "access_token": credentials["oauth_token"],
-        "access_token_secret": credentials["oauth_token_secret"],
-        "exp": datetime.utcnow() + timedelta(days=TWITTER_TOKEN_EXPIRATION), 
-    }
-    # new_jwt_token = jwt.encode(payload, TWITTER_JWT_SECRET, algorithm=JWT_ALGORITHM)
-    new_jwt_token = create_access_token(identity=current_user, additional_claims=payload)
-
-
-    return jsonify({"access_token": new_jwt_token})
-
-
-
-
-
-
-
-
 
 @twitter_bp.route("/profile", methods=["GET"])
+@jwt_required()
 def profile():
     """ Fetch user profile """
-    oauth_token = request.args.get("oauth_token")
     auth_header = request.headers.get("Authorization")
-    # return jsonify({"message": "Callback received successfully!"}), 200
     
-
-    if not oauth_token or not auth_header:
+    if not auth_header:
         return jsonify({"error": "Missing credentials"}), 400
     
-    # print("auth_header:", auth_header)
-    jwt_token = auth_header.split(" ")[1]  # ✅ Extract actual token
-    print("jwt_token:", jwt_token)
-    jwt_token = jwt_token.encode("utf-8")
-
-    # Decode JWT to get stored OAuth tokens
     try:
-        # decoded_token = jwt.decode(jwt_token, TWITTER_JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        decoded_token = get_jwt_identity()
+        user_id = get_jwt_identity()
+        auth= get_twitter_auth_from_user_id(user_id)
     except Exception as e:
         return jsonify({"error": str(e)}), 401
-    # except jwt.ExpiredSignatureError:
-    #     return jsonify({"error": "Token expired. Please login again."}), 401
-    # except jwt.InvalidTokenError:
-    #     return jsonify({"error": "Invalid token"}), 401
     
 
     oauth = OAuth1(
         CLIENT_ID, CLIENT_SECRET,
-        decoded_token["access_token"], decoded_token["access_token_secret"]
+        auth["access_token"], auth["access_token_secret"]
     )
 
     response = requests.get(USER_INFO_URL, auth=oauth)
@@ -271,17 +214,11 @@ def schedule_tweet():
     """Schedule a tweet for later posting."""
     data = request.get_json(force=True)  # Force parsing JSON to avoid raw bytes issue
 
-    # print("request data:", data)
     user_id = data['user_id']  # User identifier
     
     tweet_text = data['tweet_text']
     scheduled_time = data['scheduled_time']  # Expected format: YYYY-MM-DD HH:MM:SS
     image_file = data["image_url"]
-    # print("debugging user_id:", user_id)
-    # print("debugging tweet_text:", tweet_text)
-    # print("debugging scheduled_time:", scheduled_time)
-    # print("debugging image_file:", image_file)
-    # return jsonify({"message": "Tweet scheduled successfully!"}), 200
 
     if not user_id or not tweet_text or not scheduled_time :
         return jsonify({"error": "Missing required fields"}), 400
@@ -293,8 +230,8 @@ def schedule_tweet():
         return jsonify({"error": "Invalid datetime format"}), 400
 
     print("Scheduled Time:", scheduled_time)
-    # if scheduled_time < datetime.now():
-    #     return jsonify({"error": "Scheduled time must be in the future"}), 400
+    if scheduled_time < datetime.now():
+        return jsonify({"error": "Scheduled time must be in the future"}), 400
     # Upload image if provided
     image_url = None
     # image_url = 'https://res.cloudinary.com/doh1eotn4/image/upload/v1740178110/zs84nivaopyr5serx6af.png'

@@ -66,7 +66,6 @@ const ScheduleTweet = () => {
 
       if (response.status === 200) {
         alert("Tweet scheduled successfully!");
-        navigate("/dashboard"); // Navigate to the dashboard or home after success
       } else {
         alert("Failed to schedule tweet.");
       }

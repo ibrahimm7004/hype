@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import twitterCallback from "../../utils/twitterCallback";
+import fetchData from "../../utils/fetchData";
 
 const TwitterProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -9,13 +10,6 @@ const TwitterProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("twitter_jwt_token");
-        if (!token) {
-          setError("No Twitter OAuth token found.");
-          setLoading(false);
-          return;
-        }
-
         const storedProfile = localStorage.getItem("twitter_profile");
         if (storedProfile) {
           setProfile(JSON.parse(storedProfile));
@@ -23,10 +17,7 @@ const TwitterProfile = () => {
           return;
         }
 
-        const profileData = await twitterCallback(
-          `/twitter/profile?oauth_token=${token}`,
-          "GET"
-        );
+        const profileData = await fetchData(`/twitter/profile`, "GET");
 
         if (profileData?.data?.user) {
           setProfile(profileData.data.user);
