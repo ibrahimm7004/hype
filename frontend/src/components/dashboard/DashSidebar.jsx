@@ -20,7 +20,7 @@ const menuItems = [
   {
     name: "Create Post",
     icon: <FaHome />,
-    path: "/social-platform/twitter/post",
+    path: "/social-platform/create-post",
   },
   {
     name: "Schedule Post",

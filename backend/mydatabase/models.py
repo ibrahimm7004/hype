@@ -35,3 +35,24 @@ class UserToken(db.Model):
     oauth_token_secret = db.Column(db.String(255), nullable=False)  # Access token secret
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=True)
+
+
+
+class RedditUserToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(16), db.ForeignKey('user.user_id', ondelete="CASCADE"), nullable=False, index=True)
+    reddit_user_id = db.Column(db.String(50), nullable=False, unique=True)  # Reddit user ID
+    username = db.Column(db.String(50), nullable=False)  # Reddit username
+    access_token = db.Column(db.Text, nullable=False)  # OAuth access token
+    refresh_token = db.Column(db.Text, nullable=False)  # OAuth refresh token
+    token_expires_at = db.Column(db.DateTime, nullable=False)  # Token expiration time
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
+
+    def is_token_expired(self):
+        """Check if the access token has expired."""
+        return datetime.utcnow() >= self.token_expires_at
+    
+    
+    
+    

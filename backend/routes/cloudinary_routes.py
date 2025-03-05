@@ -19,6 +19,12 @@ cloudinary.config(
 # Create a Flask Blueprint for Cloudinary routes
 cloudinary_bp = Blueprint("cloudinary", __name__)
 
+
+def cloudinary_upload(img_file):
+    """Upload image to Cloudinary"""
+    upload_result = cloudinary.uploader.upload(img_file)
+    return upload_result
+    
 ### UPLOAD IMAGE ###
 @cloudinary_bp.route("/upload", methods=["POST"])
 def upload_image():
@@ -29,7 +35,7 @@ def upload_image():
 
         file = request.files["file"]
 
-        upload_result = cloudinary.uploader.upload(file)
+        upload_result = cloudinary_upload(file)
 
         return jsonify({"message": "Upload successful", "data": upload_result}), 200
     except Exception as e:

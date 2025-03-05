@@ -27,6 +27,8 @@ import MemeTextGenPage from "./pages/MemeTextGenPage";
 import SchedulePost from "./pages/SchedulePost";
 import RedditProfile from "./components/SocialPlatformPage/RedditProfile";
 import SocialProfiles from "./components/SocialPlatformPage/SocialProfiles";
+import CreatPost from "./components/SocialPlatformPage/CreatPost";
+import RedditCallback from "./components/SocialPlatformPage/RedditCallback";
 
 const App = () => (
   <BrowserRouter>
@@ -38,8 +40,12 @@ const App = () => (
       {/* Authentication and Dashboard Routes */}
       <Route path="/social-platform" element={<DashboardLayout />}>
         <Route path="profiles" element={<SocialProfiles />} />
+        <Route path="create-post" element={<CreatPost />} />
         <Route index element={<SocialMediaAuthPage />} />
-        <Route path="callback" element={<TwitterCallback />} />
+        <Route path="callback">
+          <Route path="twitter" element={<TwitterCallback />} />
+          <Route path="reddit" element={<RedditCallback />} />
+        </Route>
         <Route path="twitter">
           <Route path="" element={<TwitterProfile />} />
 

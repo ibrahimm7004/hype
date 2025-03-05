@@ -12,6 +12,8 @@ const RedditProfile = () => {
     try {
       setLoading(true);
       setError(null);
+
+      const user_id = localStorage.getItem("user_id");
       const storedProfile = localStorage.getItem("reddit_profile");
       if (storedProfile) {
         setProfile(JSON.parse(storedProfile));
@@ -19,7 +21,10 @@ const RedditProfile = () => {
         return;
       }
 
-      const profileData = await fetchData(`/reddit/profile`, "GET");
+      const profileData = await fetchData(
+        `/reddit/profile?user_id=${user_id}`,
+        "GET"
+      );
 
       console.log("Profile Data:", profileData);
 
