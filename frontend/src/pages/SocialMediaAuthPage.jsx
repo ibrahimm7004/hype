@@ -60,14 +60,6 @@ const SocialMediaAuthPage = () => {
       );
       console.log(`Response login Platform ${platform.id}:`, response);
 
-      // Save the token in local storage
-      // localStorage.setItem(
-      //   `${platform.id}_jwt_token`,
-      //   response.data.twitter_token
-      // );
-      // localStorage.setItem("oauth_token", response.data.oauth_token);
-
-      // Redirect to authentication URL
       window.location.href = response.data.auth_url;
     } catch (err) {
       console.log("Error logging in:", err);

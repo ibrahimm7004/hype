@@ -68,8 +68,8 @@ def check_and_post_tweets():
 
 
 # # Run every minute
-scheduler.add_job(check_and_post_tweets, "interval", minutes=1)
-scheduler.start()
+# scheduler.add_job(check_and_post_tweets, "interval", minutes=1)
+# scheduler.start()
 
 
 

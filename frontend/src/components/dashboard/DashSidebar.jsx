@@ -14,7 +14,7 @@ const menuItems = [
   {
     name: "Social Profile",
     icon: <FaUser />,
-    path: "/social-platform/twitter",
+    path: "/social-platform/profiles",
   },
   { name: "Authenticate", icon: <FaLock />, path: "/social-platform" },
   {
