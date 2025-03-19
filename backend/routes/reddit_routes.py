@@ -56,12 +56,14 @@ def auth():
     user_id = request.json.get("user_id")
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
+    
+
 
     auth_url = (
         f"https://www.reddit.com/api/v1/authorize?"
         f"client_id={REDDIT_CLIENT_ID}&response_type=code&state={user_id}&"
         f"redirect_uri={REDDIT_REDIRECT_URI}&duration=permanent&"
-        f"scope=identity submit"
+        f"scope=identity submit history"
     )
     return jsonify({"auth_url": auth_url})
 
@@ -220,3 +222,63 @@ def post_content():
 
     return jsonify({"data": response.json(), "message": "Post created successfully"}), 200
 
+
+@reddit_bp.route('/posts', methods=['GET'])
+def get_user_posts():
+    print("[DEBUG] Received request for user posts")
+    
+    user_id = request.args.get("user_id")
+    print(f"[DEBUG] Extracted user_id: {user_id}")
+    
+    if not user_id:
+        print("[ERROR] No user ID provided")
+        return jsonify({"error": "User ID is required"}), 400
+
+    user_token = get_user_token(user_id)
+    print(f"[DEBUG] Retrieved user token: {user_token}")
+    
+    if not user_token:
+        print("[ERROR] User not authenticated")
+        return jsonify({"error": "User not authenticated"}), 401
+
+    access_token = user_token.access_token
+    print(f"[DEBUG] Initial access token: {access_token}")
+    
+    if user_token.is_token_expired():
+        print("[DEBUG] Token expired, refreshing token...")
+        access_token = refresh_access_token(user_id)
+        print(f"[DEBUG] New access token: {access_token}")
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "User-Agent": REDDIT_USER_AGENT,
+    }
+    print(f"[DEBUG] Request headers: {headers}")
+
+    # Get the authenticated username from Reddit API
+    profile_response = requests.get("https://oauth.reddit.com/api/v1/me", headers=headers)
+    print(f"[DEBUG] Profile API response: {profile_response.status_code}")
+    print(f"[DEBUG] Profile API response body: {profile_response.text}")
+
+    if profile_response.status_code != 200:
+        return jsonify({"error": "Failed to fetch profile", "details": profile_response.json()}), 400
+
+    reddit_username = profile_response.json().get("name")
+    print(f"[DEBUG] Extracted Reddit username: {reddit_username}")
+    
+    if not reddit_username:
+        print("[ERROR] Could not retrieve Reddit username")
+        return jsonify({"error": "Could not retrieve Reddit username"}), 400
+
+    # Fetch user posts
+    posts_url = f"https://oauth.reddit.com/user/Sea_Lifeguard_4902/submitted"
+    print(f"[DEBUG] Fetching posts from URL: {posts_url}")
+    response = requests.get(posts_url, headers=headers)
+    
+    print(f"[DEBUG] Posts API response: {response.status_code}")
+    print(f"[DEBUG] Posts API response body: {response.text}")
+
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch user posts", "details": response.json()}), 400
+
+    return jsonify(response.json())

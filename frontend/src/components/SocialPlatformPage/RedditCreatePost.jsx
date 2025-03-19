@@ -209,6 +209,11 @@ const RedditCreatePost = () => {
               <motion.button
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 flex items-center"
                 whileHover={{ scale: 1.05 }}
+                onClick={() => {
+                  setTitle("");
+                  setBody("");
+                  setSelectedFile(null);
+                }}
               >
                 <FontAwesomeIcon icon={faTrash} className="mr-2" />
                 Discard

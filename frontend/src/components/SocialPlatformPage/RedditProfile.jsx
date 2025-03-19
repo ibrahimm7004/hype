@@ -2,11 +2,28 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaReddit, FaUser, FaCalendar, FaCheckCircle } from "react-icons/fa";
 import fetchData from "../../utils/fetchData";
+import RedditFeed from "./RedditFeed";
 
 const RedditProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  function extractUserPosts(rawData) {
+    rawData.forEach((element) => {
+      console.log(element.data);
+    });
+    return rawData.map((post) => ({
+      id: post.id,
+      title: post.title,
+      author: post.author,
+      created_utc: post.created_utc,
+      num_comments: post.num_comments,
+      score: post.score,
+      thumbnail: post.thumbnail,
+      url: post.url,
+    }));
+  }
 
   const fetchProfile = async () => {
     try {
@@ -15,6 +32,17 @@ const RedditProfile = () => {
 
       const user_id = localStorage.getItem("user_id");
       const storedProfile = localStorage.getItem("reddit_profile");
+
+      // let posts = localStorage.getItem("posts");
+      // posts = JSON.parse(posts);
+
+      // console.log(posts.children);
+
+      // const clean = extractUserPosts(posts.children);
+
+      // console.log(clean);
+
+      // console.log("posts", posts);
       if (storedProfile) {
         setProfile(JSON.parse(storedProfile));
         setLoading(false);
@@ -26,7 +54,11 @@ const RedditProfile = () => {
         "GET"
       );
 
-      console.log("Profile Data:", profileData);
+      // console.log("Profile Data:", profileData);
+      // console.log("user posts:", userPosts.data.data.children);
+
+      // const cleanData = extractUserPosts(userPosts.data.data.children);
+      // console.log(cleanData);
 
       if (profileData?.data) {
         setProfile(profileData.data);
@@ -74,7 +106,7 @@ const RedditProfile = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="max-w-lg mx-auto bg-white shadow-lg rounded-2xl p-6 border border-gray-200"
+      className="w-1/2 mx-auto bg-white shadow-lg rounded-2xl p-6 border border-gray-200"
     >
       <div className="flex items-center space-x-4">
         <img
@@ -132,6 +164,8 @@ const RedditProfile = () => {
           </p>
         </div>
       )}
+
+      <RedditFeed />
 
       <div className="mt-4 text-center">
         <motion.button
