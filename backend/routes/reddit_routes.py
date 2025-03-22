@@ -4,8 +4,14 @@ import base64
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from mydatabase.models import db, RedditUserToken  # Import the RedditUserToken model
+from mydatabase.models import db, RedditUserToken, RedditPostSchedule  # Import the RedditUserToken model
 from routes.cloudinary_routes import cloudinary_upload
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    get_jwt_identity,get_jwt
+)
 # Load environment variables
 load_dotenv()
 
@@ -159,6 +165,63 @@ def profile():
         return jsonify({"error": "Failed to fetch profile", "details": response.json()}), 400
 
     return jsonify(response.json())
+
+
+@reddit_bp.route('/schedule-post', methods=['POST'])
+@jwt_required()
+def schedule_post():
+    """Schedules a Reddit post."""
+    data = request.form
+    user_id = get_jwt_identity()
+    title = data.get("title")
+    text = data.get("text")
+    scheduled_time = data.get("scheduled_time")  # Expecting YYYY-MM-DD HH:MM:SS format
+    image = request.files.get("image")
+    
+    print('user_id', user_id)
+    print('title',title)
+    print('text',text)
+    print('scheduled_time',scheduled_time)  
+    print('image',image)
+    
+    
+    
+
+    if not user_id or not title or not scheduled_time:
+        return jsonify({"error": "User ID, title, and scheduled time are required"}), 400
+
+    # Convert scheduled_time to datetime
+    try:
+        scheduled_time = datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M")
+    except ValueError:
+        return jsonify({"error": "Invalid scheduled time format"}), 400
+
+    image_url = None
+    if image:
+        img_upload_res = cloudinary_upload(image)
+        if img_upload_res:
+            image_url = img_upload_res.get("secure_url")
+        else:
+            return jsonify({"error": "Image upload failed"}), 400
+    print("img_url")
+    print("formated time",scheduled_time)
+    # Save post schedule in DB
+    new_post = RedditPostSchedule(
+        title=title,
+        subreddit=f"u_{user_id}",  # Assuming user posts on their profile
+        kind="link" if image_url else "self",
+        url=image_url,
+        text=text,
+        scheduled_time=scheduled_time,
+        posted=False
+    )
+    print(new_post.title)
+    # return jsonify({'message': 'scheduled reddit post successfully!'}),200
+    db.session.add(new_post)
+    db.session.commit()
+
+    return jsonify({"message": "Post scheduled successfully", "post_id": new_post.id}), 201
+
 
 @reddit_bp.route('/post', methods=['POST'])
 def post_content():

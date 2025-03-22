@@ -54,5 +54,17 @@ class RedditUserToken(db.Model):
         return datetime.utcnow() >= self.token_expires_at
     
     
-    
-    
+
+
+class RedditPostSchedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    subreddit = db.Column(db.String(100), nullable=False)
+    kind = db.Column(db.String(10), nullable=False)  # "self" or "link"
+    url = db.Column(db.Text, nullable=True)  # Only for "link" posts
+    text = db.Column(db.Text, nullable=True)  # Only for "self" posts
+    scheduled_time = db.Column(db.DateTime, nullable=False)  # When to post
+    posted = db.Column(db.Boolean, default=False)  # Track if it's posted
+
+    def __repr__(self):
+        return f"<RedditPostSchedule {self.title}>"

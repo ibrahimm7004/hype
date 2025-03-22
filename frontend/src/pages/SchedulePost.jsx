@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ScheduledTweetsList from "../components/scheduleTweets/ScheduledTweetsList";
 import ScheduleTweet from "../components/scheduleTweets/ScheduleTweet";
 import { motion } from "framer-motion";
+import ScheduleRedditPost from "../components/schedule/reddit/ScheduleRedditPost";
 
 const SchedulePost = () => {
   const [activeTab, setActiveTab] = useState("list");
@@ -35,7 +36,12 @@ const SchedulePost = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {activeTab === "list" ? <ScheduledTweetsList /> : <ScheduleTweet />}
+          {/* {activeTab === "list" ? <ScheduledTweetsList /> : <ScheduleTweet />} */}
+          {activeTab === "list" ? (
+            <ScheduledTweetsList />
+          ) : (
+            <ScheduleRedditPost />
+          )}
         </motion.div>
       </div>
     </div>
