@@ -1,10 +1,14 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect } from "react";
-import { use } from "react";
-import { useState } from "react";
-import UserMenu from "./UserMenu";
-import { FaUser, FaSignOutAlt, FaCaretDown, FaCaretUp } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import {
+  FaUser,
+  FaCaretDown,
+  FaCaretUp,
+  FaHamburger,
+  FaLine,
+  FaBars,
+} from "react-icons/fa";
+import UserMenu from "./UserMenu";
 
 const Navbar = () => {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
@@ -16,44 +20,40 @@ const Navbar = () => {
       setUserLoggedIn(true);
       const username = localStorage.getItem("user_display_name");
       if (username) {
-        setUserName(localStorage.getItem("user_display_name"));
+        setUserName(username);
       }
     }
   }, [userLoggedIn]);
-  const linksStyle =
-    "text-md text-gray-500 cursor-pointer hover:text-gray-700 transition duration-300 hover:-translate-y-1 tracking-widest";
+
   return (
-    <div className="w-full flex justify-between items-center px-10 py-4 items-center mt-4">
-      {/* logo  */}
-      <div>
+    <div className="w-full  flex justify-between items-center px-12 bg-white py-3   mx-auto">
+      {/* Logo */}
+      <div className="flex items-center">
         <img
-          className="w-12 h-12 rounded-full"
+          className="w-14 h-14 rounded-full border border-gray-300 shadow-md"
           src="https://cdn.pixabay.com/photo/2022/09/18/07/41/logo-7462411_1280.png"
           alt="logo"
         />
       </div>
-      {/* nav links */}
-      <nav className="border border-gray-300 rounded-md bg-gray-50 flex gap-x-10 py-4 px-20">
+
+      {/* Navigation Links */}
+      <nav className="flex gap-x-10 items-center text-lg font-medium">
         <NavLink
           to="/"
           className={({ isActive }) =>
-            isActive ? "text-blue-600 font-bold" : linksStyle
+            isActive
+              ? "text-gray-800 font-bold tracking-wide"
+              : "text-gray-600 hover:text-gray-900 transition duration-300 tracking-wide"
           }
         >
           Home
         </NavLink>
-        {/* <NavLink
-          to="/social-platform"
-          className={({ isActive }) =>
-            isActive ? "text-blue-600 font-bold" : linksStyle
-          }
-        >
-          SoicalMedia
-        </NavLink> */}
         <NavLink
           to="/about"
           className={({ isActive }) =>
-            isActive ? "text-blue-600 font-bold" : linksStyle
+            isActive
+              ? "text-gray-800 font-bold tracking-wide"
+              : "text-gray-600 hover:text-gray-900 transition duration-300 tracking-wide"
           }
         >
           About
@@ -62,38 +62,40 @@ const Navbar = () => {
           <NavLink
             to="/social-platform/twitter"
             className={({ isActive }) =>
-              isActive ? "text-blue-600 font-bold" : linksStyle
+              isActive
+                ? "text-gray-800 font-bold tracking-wide"
+                : "text-gray-600 hover:text-gray-900 transition duration-300 tracking-wide"
             }
           >
             Dashboard
           </NavLink>
         ) : (
-          <NavLink to="/user/login" className={linksStyle}>
+          <NavLink
+            to="/user/login"
+            className="text-gray-600 hover:text-gray-900 transition duration-300 tracking-wide"
+          >
             Login
           </NavLink>
         )}
       </nav>
 
-      {/* cto  */}
-
+      {/* User Profile / CTA */}
       {userLoggedIn ? (
-        <div className=" relative">
+        <div className="relative">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className=" flex items-center gap-2 px-4 py-2 border-[1px] rounded-lg  hover:bg-blue-700 hover:text-white transition duration-300"
+            className="flex items-center gap-2 rounded-full text-gray-700 bg-white/60 hover:bg-gray-200 transition-all duration-300 "
           >
-            <FaUser className="text-lg" />
-            <span>{userName}</span>
-            {isOpen ? <FaCaretUp /> : <FaCaretDown />}
+            <FaBars />
           </button>
           <UserMenu isOpen={isOpen} />
         </div>
       ) : (
         <button
           onClick={() => (window.location = "/user/register")}
-          className="border-[1px] border-gray-300 rounded-full px-6 py-2 text-gray-600 hover:-translate-y-1 transition hover:bg-purple-500 hover:text-white"
+          className="px-6 py-3 border border-gray-300 rounded-full text-gray-700 bg-white/60 backdrop-blur-md hover:bg-gray-200 transition-all duration-300 shadow-md"
         >
-          SignUp
+          Sign Up
         </button>
       )}
     </div>

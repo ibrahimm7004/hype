@@ -127,16 +127,17 @@ def update_profile():
 @jwt_required()
 def get_profile():
     
-    current_user_email = get_jwt_identity()
-    if not current_user_email:
+    current_user_id = get_jwt_identity()
+    print(current_user_id)
+    if not current_user_id:
         return jsonify({"error": "Unauthorized - Invalid token"}), 401
 
-    user = User.query.filter_by(email=current_user_email).first()
+    user = User.query.filter_by(user_id=current_user_id).first()
 
     if not user:
         return jsonify({"error": "User not found"}), 404
 
     return jsonify({
         "username": user.username,
-        "email": user.email
+        "id": user.user_id
     }), 200

@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import fetchData from "../../utils/fetchData";
+import React, { useState, useEffect, useRef } from "react";
 import { FaPencilAlt } from "react-icons/fa";
+import fetchData from "../../utils/fetchData";
+import { gsap } from "gsap";
 
 const UserProfile = () => {
-  const [userData, setUserData] = useState({
-    username: "",
-    email: "",
-  });
-
+  const [userData, setUserData] = useState({ username: "", email: "" });
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const cardRef = useRef(null);
 
   useEffect(() => {
+    gsap.fromTo(
+      cardRef.current,
+      { opacity: 0, y: 50 },
+      { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
+    );
+
     const fetchUser = async () => {
       try {
         const response = await fetchData("/auth/profile", "GET");
         setUserData(response.data);
-        console.log("User Data:", response.data);
-
         localStorage.setItem("user_display_name", response.data.username);
       } catch (err) {
         setError("Failed to load profile. Please try again.");
@@ -43,7 +44,7 @@ const UserProfile = () => {
     try {
       const response = await fetchData("/auth/update-profile", "PUT", userData);
       if (response.status === 200) {
-        setMessage("Profile updated successfully.");
+        setMessage("🎉 Profile updated successfully!");
         setEditMode(false);
       } else {
         setError(response.data.error || "Update failed. Please try again.");
@@ -56,99 +57,109 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="flex relative items-center justify-center min-h-screen bg-gray-100">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="w-full relative max-w-md bg-white shadow-sm rounded-lg p-6 -mt-40"
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-10">
+      <div
+        ref={cardRef}
+        className="flex flex-col md:flex-row bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-6xl min-h-[32rem]"
       >
-        {!editMode && (
-          <button
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            onClick={() => setEditMode(true)}
-          >
-            <FaPencilAlt className="text-sm" />
-          </button>
-        )}
-
-        <h2 className="text-xl font-semibold text-gray-800 text-center">
-          {editMode ? "Edit Profile" : "Profile"}
-        </h2>
-        <p className="text-center text-gray-500 mb-4">
-          {editMode ? "Update your details" : "Manage your account"}
-        </p>
-
-        {message && (
-          <p className="text-green-600 text-sm text-center">{message}</p>
-        )}
-        {error && <p className="text-red-600 text-sm text-center">{error}</p>}
-
-        {!editMode ? (
-          <div className="flex flex-col items-center space-y-4">
-            <div className="w-20 h-20 rounded-full overflow-hidden border border-gray-300">
-              <img
-                src={
-                  userData.profilePic ||
-                  "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_1280.png"
-                }
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-800">
-                {userData.username}
-              </h3>
-              <p className="text-gray-500">{userData.email}</p>
-            </div>
-
-            <button
-              onClick={() => {
-                localStorage.removeItem("access_token");
-                localStorage.removeItem("refresh_token");
-                window.location = "/user/login";
-              }}
-              className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition"
-            >
-              Logout
-            </button>
+        {/* Profile Image Section */}
+        <div className="md:w-1/2 bg-gray-900 text-white flex flex-col items-center justify-center p-10 space-y-6">
+          <img
+            src={userData.profilePic || "/user-profile-avatar.jpg"}
+            alt="Profile"
+            className="w-52 h-52 rounded-full border-4 border-white object-cover shadow-lg"
+          />
+          <div className="text-center space-y-2">
+            <h3 className="text-3xl font-bold">
+              {userData.username || "Your Name"}
+            </h3>
+            <p className="text-gray-300 text-lg">
+              {editMode
+                ? "Keep your identity up to date."
+                : "Hey there 👋 Update your info anytime!"}
+            </p>
           </div>
-        ) : (
-          <form onSubmit={handleUpdate} className="space-y-4">
-            <div>
-              <label className="block text-gray-600 text-sm">Username</label>
-              <input
-                type="text"
-                name="username"
-                value={userData.username}
-                onChange={handleChange}
-                className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-gray-400"
-              />
-            </div>
+        </div>
 
-            <div>
-              <label className="block text-gray-600 text-sm">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={userData.email}
-                readOnly
-                className="w-full border px-3 py-2 rounded-lg bg-gray-100 cursor-not-allowed"
-              />
-            </div>
-
+        {/* Info & Form Section */}
+        <div className="md:w-1/2 p-12 relative flex flex-col justify-center">
+          {!editMode && (
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gray-700 hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition"
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600"
+              onClick={() => setEditMode(true)}
             >
-              {loading ? "Saving..." : "Save Changes"}
+              <FaPencilAlt size={20} />
             </button>
-          </form>
-        )}
-      </motion.div>
+          )}
+
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+            {editMode ? "Edit Profile" : "Profile Overview"}
+          </h2>
+          <p className="text-gray-500 text-lg mb-6">
+            {editMode
+              ? "Update your profile and keep your info accurate and professional."
+              : "Review your personal information below."}
+          </p>
+
+          {message && <p className="text-green-600 text-md mb-4">{message}</p>}
+          {error && <p className="text-red-600 text-md mb-4">{error}</p>}
+
+          {!editMode ? (
+            <div className="space-y-6 text-lg">
+              <div>
+                <label className="block text-gray-600 text-sm">Username</label>
+                <p className="text-gray-900 font-semibold">
+                  {userData.username}
+                </p>
+              </div>
+              <div>
+                <label className="block text-gray-600 text-sm">Email</label>
+                <p className="text-gray-900 font-semibold">{userData.email}</p>
+              </div>
+              <button
+                onClick={() => {
+                  localStorage.removeItem("access_token");
+                  localStorage.removeItem("refresh_token");
+                  window.location = "/user/login";
+                }}
+                className="mt-10 w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl text-lg transition"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleUpdate} className="space-y-6">
+              <div>
+                <label className="block text-gray-600 text-md">Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={userData.username}
+                  onChange={handleChange}
+                  className="w-full border px-4 py-3 text-lg rounded-xl focus:ring-2 focus:ring-gray-400"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-600 text-md">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={userData.email}
+                  readOnly
+                  className="w-full border px-4 py-3 text-lg rounded-xl bg-gray-100 cursor-not-allowed"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-3 px-6 rounded-xl transition"
+              >
+                {loading ? "Saving..." : "Save Changes"}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

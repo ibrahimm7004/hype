@@ -29,6 +29,8 @@ import RedditProfile from "./components/SocialPlatformPage/RedditProfile";
 import SocialProfiles from "./components/SocialPlatformPage/SocialProfiles";
 import CreatPost from "./components/SocialPlatformPage/CreatPost";
 import RedditCallback from "./components/SocialPlatformPage/RedditCallback";
+import MemeGenPage from "./pages/MemeGenPage";
+import TextGenPage from "./pages/TextGenPage";
 
 const App = () => (
   <BrowserRouter>
@@ -54,7 +56,9 @@ const App = () => (
           <Route path="post" element={<TwitterCreatePost />} />
 
           <Route path="ai-marketing">
-            <Route path="" element={<AiMarketing />} />
+            {/* <Route path="" element={<AiMarketing />} /> */}
+            <Route path="text" element={<TextGenPage />} />
+            <Route path="meme" element={<MemeGenPage />} />
             <Route path="memeText" element={<MemeTextGenPage />} />
             <Route path="memeImage" element={<MemeImgGenPage />} />
           </Route>

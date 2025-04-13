@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Add Glassmorphism Effect */
+.glassmorphic {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Elegant Button */
+  .btn-elegant {
+    @apply px-6 py-3 border border-gray-300 rounded-full text-gray-700 bg-white/60 backdrop-blur-md hover:bg-gray-200 transition-all duration-300 shadow-md;
+  }
+  
+  /* Elegant NavLink */
+  .nav-link {
+    @apply text-gray-600 hover:text-gray-900 transition duration-300 tracking-wide text-lg font-medium;
+  }

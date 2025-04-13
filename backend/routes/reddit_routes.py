@@ -58,7 +58,7 @@ def refresh_access_token(user_id):
 
 # Step 1: Get Reddit authentication URL
 @reddit_bp.route('/login', methods=['POST'])
-def auth():
+def reddit_auth():
     user_id = request.json.get("user_id")
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
@@ -141,8 +141,9 @@ def callback():
 
 # Step 3: Fetch user profile
 @reddit_bp.route('/profile', methods=['GET'])
+@jwt_required
 def profile():
-    user_id = request.args.get("user_id")
+    user_id = get_jwt_identity()
     print("User ID:", user_id)  # Debugging
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
@@ -177,15 +178,7 @@ def schedule_post():
     text = data.get("text")
     scheduled_time = data.get("scheduled_time")  # Expecting YYYY-MM-DD HH:MM:SS format
     image = request.files.get("image")
-    
-    print('user_id', user_id)
-    print('title',title)
-    print('text',text)
-    print('scheduled_time',scheduled_time)  
-    print('image',image)
-    
-    
-    
+
 
     if not user_id or not title or not scheduled_time:
         return jsonify({"error": "User ID, title, and scheduled time are required"}), 400
@@ -203,8 +196,7 @@ def schedule_post():
             image_url = img_upload_res.get("secure_url")
         else:
             return jsonify({"error": "Image upload failed"}), 400
-    print("img_url")
-    print("formated time",scheduled_time)
+
     # Save post schedule in DB
     new_post = RedditPostSchedule(
         title=title,
@@ -216,7 +208,6 @@ def schedule_post():
         posted=False
     )
     print(new_post.title)
-    # return jsonify({'message': 'scheduled reddit post successfully!'}),200
     db.session.add(new_post)
     db.session.commit()
 
@@ -224,9 +215,10 @@ def schedule_post():
 
 
 @reddit_bp.route('/post', methods=['POST'])
+@jwt_required()
 def post_content():
     data = request.form
-    user_id = request.args.get("user_id")
+    user_id = get_jwt_identity()
     title = data.get("title")
     text = data.get("text")
     
@@ -287,10 +279,11 @@ def post_content():
 
 
 @reddit_bp.route('/posts', methods=['GET'])
+@jwt_required()
 def get_user_posts():
     print("[DEBUG] Received request for user posts")
     
-    user_id = request.args.get("user_id")
+    user_id = get_jwt_identity()
     print(f"[DEBUG] Extracted user_id: {user_id}")
     
     if not user_id:
