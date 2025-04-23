@@ -44,9 +44,9 @@ const Hero = () => {
     });
 
     scrollTl
-      .to(imgRef.current, { width: "500px", x: "40vw", duration: 1 }) // move right
-      .to(imgRef.current, { x: "0vw", duration: 1 }) // back to center
-      .to(imgRef.current, { x: "-40vw", duration: 1 }); // move left
+      .to(imgRef.current, { width: "500px", x: "30vw", duration: 1 }) // move right
+      .to(imgRef.current, { x: "-30vw", duration: 1 }) // back to center
+      .to(imgRef.current, { x: "30vw", duration: 1 }); // move left
   }, []);
 
   return (

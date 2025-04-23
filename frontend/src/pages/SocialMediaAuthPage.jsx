@@ -41,7 +41,7 @@ const SocialMediaAuthPage = () => {
       icon: <FaTwitter size={20} />,
     },
     {
-      id: "instagram",
+      id: "meta/instagram",
       name: "Instagram",
       color: "#E4405F",
       icon: <FaInstagram size={20} />,
@@ -53,7 +53,7 @@ const SocialMediaAuthPage = () => {
       icon: <FaReddit size={20} />,
     },
     {
-      id: "facebook",
+      id: "meta/facebook",
       name: "Facebook",
       color: "#1877F2",
       icon: <FaFacebook size={20} />,

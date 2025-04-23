@@ -9,7 +9,7 @@ const teamMembers = [
     email: "talha.imtiaz.dev@gmail.com",
     github: "https://github.com/talhaimtiaz09",
     linkedin: "https://www.linkedin.com/in/talha-imtiaz342/",
-    image: "https://media.licdn.com/...",
+    image: "/developers/talha.jpeg",
   },
   {
     name: "Ibrahim Mehmood",
@@ -17,7 +17,7 @@ const teamMembers = [
     email: "ibrahim123@gmail.com",
     linkedin: "https://www.linkedin.com/in/ibrahim-zm/",
     github: "https://github.com/ibrahimm7004",
-    image: "https://media.licdn.com/...",
+    image: "/developers/ibrahim.jpeg",
   },
   {
     name: "Sheryar Ahmed",
@@ -25,7 +25,7 @@ const teamMembers = [
     email: "sherry123@gmail.com",
     linkedin: "https://www.linkedin.com/in/sherry-ahmad/",
     github: "https://github.com/emsherry",
-    image: "https://media.licdn.com/...",
+    image: "/developers/sherry.jpeg",
   },
 ];
 

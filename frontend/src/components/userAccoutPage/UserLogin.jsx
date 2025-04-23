@@ -46,9 +46,14 @@ const UserLogin = () => {
       y: 50,
       stagger: 0.2,
       duration: 1,
-      delay: 0.8,
+      delay: 0.4,
     });
-    gsap.from(".form-button", { opacity: 0, y: 50, duration: 0.8, delay: 1.5 });
+    gsap.from(".form-button", {
+      opacity: 0,
+      y: -50,
+      duration: 1,
+      delay: 0.5,
+    });
   }, []);
 
   return (
@@ -99,7 +104,7 @@ const UserLogin = () => {
           <button
             type="submit"
             disabled={loading}
-            className="form-button w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
+            className="form-button w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg"
           >
             {loading ? "Logging in..." : "Login"}
           </button>

@@ -31,6 +31,8 @@ import CreatPost from "./components/SocialPlatformPage/CreatPost";
 import RedditCallback from "./components/SocialPlatformPage/RedditCallback";
 import MemeGenPage from "./pages/MemeGenPage";
 import TextGenPage from "./pages/TextGenPage";
+import UserFacebookPageList from "./components/meta/facebook/UserFacebookPageList";
+import SaveInstagramId from "./components/meta/instagram/SaveInstagramId";
 
 const App = () => (
   <BrowserRouter>
@@ -39,6 +41,10 @@ const App = () => (
       {/* Landing Page */}
       <Route path="/" element={<LandingPage />} />
 
+      <Route path="meta">
+        {/* <Route path="" element={<UserFacebookPageList />} /> */}
+        <Route path="" element={<SaveInstagramId />} />
+      </Route>
       {/* Authentication and Dashboard Routes */}
       <Route path="/social-platform" element={<DashboardLayout />}>
         <Route path="profiles" element={<SocialProfiles />} />

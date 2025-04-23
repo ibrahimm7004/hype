@@ -68,3 +68,26 @@ class RedditPostSchedule(db.Model):
 
     def __repr__(self):
         return f"<RedditPostSchedule {self.title}>"
+    
+    
+
+class MetaToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(16), db.ForeignKey('user.user_id', ondelete="CASCADE"), nullable=False, index=True)
+    
+    access_token = db.Column(db.Text, nullable=False)  # Short-lived or initial access token
+    page_access_token = db.Column(db.Text, nullable=True)  # Facebook Page access token
+    long_lived_token = db.Column(db.Text, nullable=True)  # Long-lived access token
+    
+    facebook_page_id = db.Column(db.String(50), nullable=True, unique=True)
+    insta_page_id = db.Column(db.String(50), nullable=True, unique=True)  # Instagram Business account ID
+    
+    token_expires_at = db.Column(db.DateTime, nullable=True)  # Optional: expiration of long-lived token
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
+
+    def is_token_expired(self):
+        """Check if the long-lived token has expired (if set)."""
+        if not self.token_expires_at:
+            return False
+        return datetime.utcnow() >= self.token_expires_at
