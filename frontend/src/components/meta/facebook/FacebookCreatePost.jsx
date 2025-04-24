@@ -4,13 +4,14 @@ import fetchData from "../../../utils/fetchData";
 
 const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
   const [postText, setPostText] = useState(initialText);
-  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(initialImage);
   const [imageFile, setImageFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
   const [charCount, setCharCount] = useState(initialText.length);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const MAX_CHAR_COUNT = 5000; // Facebook character limit
+  const MAX_CHAR_COUNT = 5000;
 
   const handleTextChange = (e) => {
     const text = e.target.value;
@@ -24,14 +25,21 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImagePreview(URL.createObjectURL(file));
       setImageFile(file);
+      setImageUrl(""); // clear URL input
     }
   };
 
+  const handleUrlChange = (e) => {
+    setImageUrl(e.target.value);
+    setImageFile(null); // clear file input
+    setImagePreview(e.target.value);
+  };
+
   const handlePost = async () => {
-    if (postText.length === 0 && !imageFile) {
-      alert("Post must have text or an image.");
+    if (postText.length === 0 && !imageFile && !imageUrl) {
+      alert("Post must have text, image URL, or an uploaded image.");
       return;
     }
 
@@ -40,7 +48,8 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
     try {
       const formData = new FormData();
       formData.append("post_text", postText);
-      if (imageFile) formData.append("image", imageFile);
+      if (imageFile) formData.append("image_file", imageFile);
+      if (imageUrl) formData.append("image_url", imageUrl);
 
       const response = await fetchData("/meta/facebook/post", "POST", formData);
       console.log(response);
@@ -49,8 +58,9 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
         alert("Post shared successfully!");
         setPostText("");
         setCharCount(0);
-        setImage(null);
+        setImagePreview("");
         setImageFile(null);
+        setImageUrl("");
       } else {
         alert("Failed to post to Facebook.");
       }
@@ -70,7 +80,7 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
         transition={{ duration: 0.5 }}
         className="bg-white shadow-lg rounded-lg p-16 pb-20 flex"
       >
-        {/* Left Info Panel */}
+        {/* Left Panel */}
         <div className="w-1/3 p-4 flex flex-col items-center border-r text-center">
           <motion.h2
             className="text-2xl font-bold text-blue-800 mb-2"
@@ -93,7 +103,7 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
           />
         </div>
 
-        {/* Right Form Panel */}
+        {/* Right Form */}
         <div className="w-2/3 p-6">
           <motion.textarea
             value={postText}
@@ -105,36 +115,35 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
             animate={{ opacity: 1, y: 0 }}
           />
 
-          {image && (
+          {imagePreview && (
             <motion.div
               className="mt-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
               <img
-                src={image}
+                src={imagePreview}
                 alt="Preview"
                 className="max-w-full rounded-md"
               />
             </motion.div>
           )}
 
-          <div className="mt-4 flex justify-between items-center">
-            <label
-              htmlFor="fb-image-upload"
-              className="cursor-pointer text-blue-600 hover:underline"
-            >
-              📷 Add Photo
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              id="fb-image-upload"
-              onChange={handleImageChange}
-              className="hidden"
-            />
-
-            <div className="flex items-center gap-2">
+          <div className="mt-4 flex flex-col gap-2">
+            <div className="flex justify-between items-center">
+              <label
+                htmlFor="fb-image-upload"
+                className="cursor-pointer text-blue-600 hover:underline"
+              >
+                📷 Upload Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                id="fb-image-upload"
+                onChange={handleImageChange}
+                className="hidden"
+              />
               <span
                 className={
                   charCount > MAX_CHAR_COUNT ? "text-red-500" : "text-gray-500"
@@ -142,10 +151,15 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
               >
                 {charCount}/{MAX_CHAR_COUNT}
               </span>
-              {errorMessage && (
-                <span className="text-red-500 text-xs">{errorMessage}</span>
-              )}
             </div>
+
+            <input
+              type="text"
+              placeholder="...or paste image URL"
+              value={imageUrl}
+              onChange={handleUrlChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
 
           <div className="mt-6 flex justify-end">

@@ -9,7 +9,8 @@ from flask_cors import CORS
 from routes.twitter_auth import twitter_bp  # Import the blueprint
 from routes.cloudinary_routes import cloudinary_bp  # Import the blueprint
 from routes.reddit_routes import reddit_bp  # Import the blueprint
-from routes.meta_routes import meta_bp
+from routes.facebook_routes import facebook_bp
+from routes.instagram_routes import instagram_bp
 from datetime import timedelta
 from Ai.meme_gen_routes import meme_gen_bp  # Import the blueprint
 from flask_session import Session
@@ -48,7 +49,9 @@ mail.init_app(app)
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(twitter_bp, url_prefix="/api/twitter")  # Twitter OAuth routes
 app.register_blueprint(reddit_bp, url_prefix="/api/reddit")  # reddit routes
-app.register_blueprint(meta_bp, url_prefix="/api/meta")  # meta routes
+# app.register_blueprint(meta_bp, url_prefix="/api/meta")  # meta routes
+app.register_blueprint(instagram_bp, url_prefix="/api/meta/instagram")  # meta routes
+app.register_blueprint(facebook_bp, url_prefix="/api/meta/facebook")  # meta routes
 app.register_blueprint(cloudinary_bp, url_prefix="/api/cloudinary")  # Cloudinary routes
 app.register_blueprint(meme_gen_bp, url_prefix="/api/ai/meme-gen")  # meme_gen routes
 
