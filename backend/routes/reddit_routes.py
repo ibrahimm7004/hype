@@ -141,10 +141,12 @@ def callback():
 
 # Step 3: Fetch user profile
 @reddit_bp.route('/profile', methods=['GET'])
-@jwt_required
+@jwt_required()
 def profile():
     user_id = get_jwt_identity()
     print("User ID:", user_id)  # Debugging
+    
+
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
 

@@ -31,14 +31,14 @@ const platforms = [
     key: "facebook",
     name: "Facebook",
     icon: faFacebook,
-    color: "blue-700",
+    color: "blue-600",
     component: <FacebookCreatePost />,
   },
   {
     key: "instagram",
     name: "Instagram",
     icon: faInstagram,
-    color: "pink-500",
+    color: "pink-600",
     component: <InstagramCreatePost />,
   },
 ];

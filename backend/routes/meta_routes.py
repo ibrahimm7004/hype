@@ -154,46 +154,6 @@ def save_instagram_id():
     db.session.commit()
     return jsonify({"instagram_page_id": ig_id})
 
-# ─────────────────────────────────────────────────────────────
-# POST TO INSTAGRAM
-# ─────────────────────────────────────────────────────────────
-# @meta_bp.route('/instagram/post', methods=["POST"])
-# @jwt_required()
-# def post_to_instagram():
-#     current_user = get_jwt_identity()
-#     token = MetaToken.query.filter_by(user_id=current_user).first()
-#     if not token or not token.instagram_page_id or not token.page_access_token:
-#         return jsonify({"error": "Instagram ID or page token missing"}), 400
-
-#     data = request.json
-#     image_url = data.get("image_url")
-#     caption = data.get("caption")
-
-#     if not image_url:
-#         return jsonify({"error": "image_url required"}), 400
-
-#     # Step 1: Create media object
-#     media_url = f'https://graph.facebook.com/v18.0/{token.instagram_page_id}/media'
-#     media_payload = {
-#         'image_url': image_url,
-#         'caption': caption or '',
-#         'access_token': token.page_access_token
-#     }
-#     media_response = requests.post(media_url, data=media_payload).json()
-#     creation_id = media_response.get("id")
-
-#     if not creation_id:
-#         return jsonify({"error": "Failed to create media", "details": media_response}), 400
-
-#     # Step 2: Publish
-#     publish_url = f'https://graph.facebook.com/v18.0/{token.instagram_page_id}/media_publish'
-#     publish_response = requests.post(publish_url, data={
-#         'creation_id': creation_id,
-#         'access_token': token.page_access_token
-#     })
-
-#     return jsonify(publish_response.json())
-
 
 
 
@@ -362,3 +322,41 @@ def post_to_instagram():
         return jsonify({"error": "Failed to publish Instagram media", "details": publish_data}), 400
 
     return jsonify({"message": "Successfully posted to Instagram", "response": publish_data})
+
+
+
+@meta_bp.route('/facebook/page/info', methods=['GET'])
+@jwt_required()
+def get_facebook_page_info():
+    """
+    Fetch detailed Facebook Page info for the currently connected page.
+    """
+    current_user = get_jwt_identity()
+    token = MetaToken.query.filter_by(user_id=current_user).first()
+
+    if not token or not token.facebook_page_id or not token.page_access_token:
+        return jsonify({"error": "Missing Facebook page or access token"}), 400
+
+    page_id = token.facebook_page_id
+    access_token = token.page_access_token
+
+    # Define the Graph API endpoint and fields to fetch
+    url = f"https://graph.facebook.com/v18.0/{page_id}"
+    fields = (
+        "id,name,username,about,link,category,category_list,"
+        "fan_count,followers_count,website,location,emails,"
+        "phone,whatsapp_number,description,cover,picture.type(large)"
+    )
+
+    response = requests.get(url, params={
+        "fields": fields,
+        "access_token": access_token
+    })
+
+    if response.status_code != 200:
+        return jsonify({
+            "error": "Failed to fetch Facebook page details",
+            "details": response.json()
+        }), 400
+
+    return jsonify(response.json())
