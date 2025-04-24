@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify, redirect
 from urllib.parse import urlencode
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime, timedelta
+
 import requests
 import os
 from dotenv import load_dotenv
+from routes.cloudinary_routes import cloudinary_upload
 
 from mydatabase.models import MetaToken
 from mydatabase.database import db  # Adjust import to your actual app structure
@@ -99,14 +100,23 @@ def post_to_instagram():
     if not token or not token.insta_page_id or not token.page_access_token:
         return jsonify({"error": "Instagram ID or token missing"}), 400
 
-    data = request.json
-    image_url = data.get("image_url")
-    caption = data.get("caption", "")
+    # Check for file upload or URL
+    image_url = request.form.get("image_url")
+    caption = request.form.get("caption", "")
+    image_file = request.files.get("image_file")
 
-    if not image_url:
-        return jsonify({"error": "Image URL is required"}), 400
+    if not image_file and not image_url:
+        return jsonify({"error": "An image file or image URL is required"}), 400
 
-    # Step 1: Create media object
+    # If image file is provided, upload to Cloudinary
+    if image_file:
+        try:
+            upload_result = cloudinary_upload(image_file)
+            image_url = upload_result["secure_url"]
+        except Exception as e:
+            return jsonify({"error": "Failed to upload to Cloudinary", "details": str(e)}), 500
+
+    # Step 1: Create media object on Instagram
     media_url = f'https://graph.facebook.com/v18.0/{token.insta_page_id}/media'
     media_payload = {
         'image_url': image_url,
@@ -134,4 +144,3 @@ def post_to_instagram():
         return jsonify({"error": "Failed to publish Instagram media", "details": publish_data}), 400
 
     return jsonify({"message": "Successfully posted to Instagram", "response": publish_data})
-
