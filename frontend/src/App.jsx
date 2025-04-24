@@ -33,6 +33,7 @@ import MemeGenPage from "./pages/MemeGenPage";
 import TextGenPage from "./pages/TextGenPage";
 import UserFacebookPageList from "./components/meta/facebook/UserFacebookPageList";
 import SaveInstagramId from "./components/meta/instagram/SaveInstagramId";
+import FacebookCallback from "./components/SocialPlatformPage/FacebookCallback";
 
 const App = () => (
   <BrowserRouter>
@@ -41,16 +42,18 @@ const App = () => (
       {/* Landing Page */}
       <Route path="/" element={<LandingPage />} />
 
-      <Route path="meta">
-        {/* <Route path="" element={<UserFacebookPageList />} /> */}
-        <Route path="" element={<SaveInstagramId />} />
-      </Route>
+      <Route path="meta"></Route>
       {/* Authentication and Dashboard Routes */}
       <Route path="/social-platform" element={<DashboardLayout />}>
+        <Route path="manage">
+          <Route path="facebook" element={<UserFacebookPageList />} />
+          <Route path="instagram" element={<SaveInstagramId />} />
+        </Route>
         <Route path="profiles" element={<SocialProfiles />} />
         <Route path="create-post" element={<CreatPost />} />
         <Route index element={<SocialMediaAuthPage />} />
         <Route path="callback">
+          <Route path="facebook" element={<FacebookCallback />} />
           <Route path="twitter" element={<TwitterCallback />} />
           <Route path="reddit" element={<RedditCallback />} />
         </Route>
@@ -84,7 +87,9 @@ const App = () => (
 
       {/* Static Pages */}
       <Route path="/about" element={<AboutPage />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route path="" element={<Dashboard />} />
+      </Route>
     </Routes>
   </BrowserRouter>
 );

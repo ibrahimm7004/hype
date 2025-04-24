@@ -85,7 +85,7 @@ def facebook_callback():
     db.session.add(token)
     db.session.commit()
 
-    return jsonify({'message': 'Facebook token saved successfully'})
+    return jsonify({'message': 'Facebook token saved successfully'}),200
 
 # ─────────────────────────────────────────────────────────────
 # STEP 3: Get Facebook Pages List
@@ -157,42 +157,42 @@ def save_instagram_id():
 # ─────────────────────────────────────────────────────────────
 # POST TO INSTAGRAM
 # ─────────────────────────────────────────────────────────────
-@meta_bp.route('/instagram/post', methods=["POST"])
-@jwt_required()
-def post_to_instagram():
-    current_user = get_jwt_identity()
-    token = MetaToken.query.filter_by(user_id=current_user).first()
-    if not token or not token.instagram_page_id or not token.page_access_token:
-        return jsonify({"error": "Instagram ID or page token missing"}), 400
+# @meta_bp.route('/instagram/post', methods=["POST"])
+# @jwt_required()
+# def post_to_instagram():
+#     current_user = get_jwt_identity()
+#     token = MetaToken.query.filter_by(user_id=current_user).first()
+#     if not token or not token.instagram_page_id or not token.page_access_token:
+#         return jsonify({"error": "Instagram ID or page token missing"}), 400
 
-    data = request.json
-    image_url = data.get("image_url")
-    caption = data.get("caption")
+#     data = request.json
+#     image_url = data.get("image_url")
+#     caption = data.get("caption")
 
-    if not image_url:
-        return jsonify({"error": "image_url required"}), 400
+#     if not image_url:
+#         return jsonify({"error": "image_url required"}), 400
 
-    # Step 1: Create media object
-    media_url = f'https://graph.facebook.com/v18.0/{token.instagram_page_id}/media'
-    media_payload = {
-        'image_url': image_url,
-        'caption': caption or '',
-        'access_token': token.page_access_token
-    }
-    media_response = requests.post(media_url, data=media_payload).json()
-    creation_id = media_response.get("id")
+#     # Step 1: Create media object
+#     media_url = f'https://graph.facebook.com/v18.0/{token.instagram_page_id}/media'
+#     media_payload = {
+#         'image_url': image_url,
+#         'caption': caption or '',
+#         'access_token': token.page_access_token
+#     }
+#     media_response = requests.post(media_url, data=media_payload).json()
+#     creation_id = media_response.get("id")
 
-    if not creation_id:
-        return jsonify({"error": "Failed to create media", "details": media_response}), 400
+#     if not creation_id:
+#         return jsonify({"error": "Failed to create media", "details": media_response}), 400
 
-    # Step 2: Publish
-    publish_url = f'https://graph.facebook.com/v18.0/{token.instagram_page_id}/media_publish'
-    publish_response = requests.post(publish_url, data={
-        'creation_id': creation_id,
-        'access_token': token.page_access_token
-    })
+#     # Step 2: Publish
+#     publish_url = f'https://graph.facebook.com/v18.0/{token.instagram_page_id}/media_publish'
+#     publish_response = requests.post(publish_url, data={
+#         'creation_id': creation_id,
+#         'access_token': token.page_access_token
+#     })
 
-    return jsonify(publish_response.json())
+#     return jsonify(publish_response.json())
 
 
 
@@ -267,3 +267,98 @@ def get_instagram_info():
     
     # Return the Instagram info from the response
     return jsonify(response.json())
+
+
+@meta_bp.route('/facebook/post', methods=["POST"])
+@jwt_required()
+def post_to_facebook():
+    current_user = get_jwt_identity()
+    token = MetaToken.query.filter_by(user_id=current_user).first()
+
+    if not token or not token.facebook_page_id or not token.page_access_token:
+        return jsonify({"error": "Facebook page ID or token missing"}), 400
+    # print(request.form)
+    
+    # return jsonify({"message":"successful"}),200
+    data = request.form
+    
+    print(data)
+    message = data.get("post_text")
+    link = data.get("link")
+    image_url = data.get("image_url")
+
+    if not message and not link and not image_url:
+        return jsonify({"error": "At least one of 'message', 'link', or 'image_url' must be provided"}), 400
+
+    post_url = f"https://graph.facebook.com/v18.0/{token.facebook_page_id}/feed"
+    post_data = {
+        "access_token": token.page_access_token,
+        "message": message
+    }
+
+    if link:
+        post_data["link"] = link
+    if image_url:
+        # Use photo endpoint if an image is provided
+        photo_url = f"https://graph.facebook.com/v18.0/{token.facebook_page_id}/photos"
+        photo_data = {
+            "url": image_url,
+            "caption": message,
+            "access_token": token.page_access_token
+        }
+        response = requests.post(photo_url, data=photo_data)
+    else:
+        # Default to feed endpoint
+        response = requests.post(post_url, data=post_data)
+
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to post to Facebook", "details": response.json()}), 400
+
+    return jsonify({"message": "Successfully posted to Facebook", "response": response.json()})
+
+
+
+@meta_bp.route('/instagram/post', methods=["POST"])
+@jwt_required()
+def post_to_instagram():
+    current_user = get_jwt_identity()
+    token = MetaToken.query.filter_by(user_id=current_user).first()
+
+    if not token or not token.insta_page_id or not token.page_access_token:
+        return jsonify({"error": "Instagram ID or token missing"}), 400
+
+    data = request.json
+    image_url = data.get("image_url")
+    caption = data.get("caption", "")
+
+    if not image_url:
+        return jsonify({"error": "Image URL is required"}), 400
+
+    # Step 1: Create media object
+    media_url = f'https://graph.facebook.com/v18.0/{token.insta_page_id}/media'
+    media_payload = {
+        'image_url': image_url,
+        'caption': caption,
+        'access_token': token.page_access_token
+    }
+    media_response = requests.post(media_url, data=media_payload).json()
+
+    if "error" in media_response:
+        return jsonify({"error": "Failed to create Instagram media", "details": media_response}), 400
+
+    creation_id = media_response.get("id")
+    if not creation_id:
+        return jsonify({"error": "Media ID not returned", "response": media_response}), 400
+
+    # Step 2: Publish media
+    publish_url = f'https://graph.facebook.com/v18.0/{token.insta_page_id}/media_publish'
+    publish_response = requests.post(publish_url, data={
+        'creation_id': creation_id,
+        'access_token': token.page_access_token
+    })
+
+    publish_data = publish_response.json()
+    if "error" in publish_data:
+        return jsonify({"error": "Failed to publish Instagram media", "details": publish_data}), 400
+
+    return jsonify({"message": "Successfully posted to Instagram", "response": publish_data})

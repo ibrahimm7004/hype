@@ -4,12 +4,13 @@ import TwitterProfile from "./TwitterProfile";
 import FacebookProfile from "./FacebookProfile";
 import InstaProfile from "./InstaProfile";
 import { motion } from "framer-motion";
+import SaveInstagramId from "../meta/instagram/SaveInstagramId";
 
 const profiles = [
   { name: "Reddit", component: <RedditProfile />, color: "text-orange-600" },
   { name: "Twitter", component: <TwitterProfile />, color: "text-blue-400" },
   { name: "Facebook", component: <FacebookProfile />, color: "text-blue-600" },
-  { name: "Instagram", component: <InstaProfile />, color: "text-pink-500" },
+  { name: "Instagram", component: <SaveInstagramId />, color: "text-pink-500" },
 ];
 
 const SocialProfiles = () => {

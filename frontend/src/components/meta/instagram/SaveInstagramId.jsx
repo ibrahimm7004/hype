@@ -1,13 +1,21 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FaInstagram, FaCheckCircle, FaSave } from "react-icons/fa";
+import {
+  FaInstagram,
+  FaCheckCircle,
+  FaSave,
+  FaUserFriends,
+  FaUserPlus,
+  FaImages,
+} from "react-icons/fa";
 import gsap from "gsap";
-import axios from "axios";
 import fetchData from "../../../utils/fetchData";
 
 const SaveInstagramId = () => {
   const [instagram, setInstagram] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(
+    localStorage.getItem("meta/instagram_authenticated") === "true"
+  );
   const [error, setError] = useState("");
 
   const containerRef = useRef(null);
@@ -18,84 +26,110 @@ const SaveInstagramId = () => {
       { opacity: 0, y: 30 },
       { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
     );
+
+    // Auto-fetch info if already authenticated
+    if (saved) {
+      fetchInstagramInfo();
+    }
   }, []);
 
-  const getInstagramInfo = async () => {
-    setLoading(true);
+  const saveInstagramId = async () => {
     setError("");
+    setLoading(true);
     try {
-      const res = await fetchData("/meta/facebook/connected-instagram");
-      if (res?.data?.id) {
-        setInstagram(res.data);
-      } else {
-        setError("No connected Instagram account found.");
-      }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setError("Failed to fetch Instagram account.");
-    }
-    setLoading(false);
-  };
-
-  const handleSave = async () => {
-    try {
-      const response = await fetchData("/meta/instagram/save-id"); // No data, all context is backend-handled
+      await fetchData("/meta/instagram/save-id");
+      localStorage.setItem("meta/instagram_authenticated", "true");
       setSaved(true);
-      console.log("handle save resp:", response);
-      // setTimeout(() => setSaved(false), 2000);
+      fetchInstagramInfo();
     } catch (err) {
       console.error("Save error:", err);
       setError("Failed to save Instagram ID.");
     }
+    setLoading(false);
+  };
+
+  const fetchInstagramInfo = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetchData("/meta/instagram/info");
+      if (res?.data?.id) {
+        setInstagram(res.data);
+      } else {
+        setError("No Instagram info available.");
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Failed to fetch Instagram info.");
+    }
+    setLoading(false);
   };
 
   return (
     <div
       ref={containerRef}
-      className="max-w-xl mx-auto mt-12 p-6 bg-white shadow-xl rounded-2xl border border-gray-100 space-y-6"
+      className="max-w-2xl mx-auto mt-12 p-6 bg-white shadow-xl rounded-2xl border border-gray-100 space-y-6"
     >
       <div className="flex items-center gap-3 text-2xl font-semibold text-gray-800">
         <FaInstagram className="text-pink-500 text-3xl" />
         Instagram Business Account
       </div>
 
-      <button
-        onClick={handleSave}
-        className="w-full px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-medium rounded-lg transition"
-      >
-        {loading ? "Fetching..." : "Get Instagram Info"}
-      </button>
-
-      {error && <div className="text-red-500 text-center text-sm">{error}</div>}
-
-      {instagram && (
-        <div className="border rounded-xl p-4 bg-gray-50 flex items-center justify-between">
-          <div>
-            <div className="text-gray-700 font-semibold">
-              @{instagram.username || "Unknown"}
-            </div>
-            <div className="text-sm text-gray-500">ID: {instagram.id}</div>
-          </div>
-          <FaCheckCircle className="text-green-500 text-xl" />
-        </div>
+      {!saved && (
+        <button
+          onClick={saveInstagramId}
+          className="w-full px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-medium rounded-lg transition"
+        >
+          {loading ? "Saving..." : "Save Instagram ID"}
+        </button>
       )}
 
-      {instagram && (
-        <div className="flex justify-end">
+      {saved && !instagram && (
+        <div className="flex justify-center mt-4">
           <button
-            onClick={handleSave}
-            className="mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-2 transition"
+            onClick={fetchInstagramInfo}
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
           >
-            <FaSave />
-            Save Instagram ID
+            {loading ? "Fetching..." : "Fetch Instagram Info"}
           </button>
         </div>
       )}
 
-      {saved && (
-        <div className="text-green-600 text-sm text-center flex items-center justify-center gap-1 mt-2">
-          <FaCheckCircle />
-          Instagram ID saved successfully!
+      {error && <div className="text-red-500 text-center text-sm">{error}</div>}
+
+      {instagram && (
+        <div className="mt-6 p-6 bg-gray-50 rounded-xl shadow-inner border">
+          <div className="flex items-center gap-4">
+            <img
+              src={instagram.profile_picture_url}
+              alt="Profile"
+              className="w-20 h-20 rounded-full border-2 border-pink-500"
+            />
+            <div>
+              <div className="text-xl font-bold text-gray-800">
+                @{instagram.username}
+              </div>
+              <div className="text-gray-600">{instagram.name}</div>
+              <p className="text-sm text-gray-500 mt-1">
+                {instagram.biography}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-around mt-6 text-center text-sm text-gray-700 font-medium">
+            <div className="flex items-center gap-1">
+              <FaUserFriends className="text-blue-500" />
+              Followers: {instagram.followers_count}
+            </div>
+            <div className="flex items-center gap-1">
+              <FaUserPlus className="text-green-500" />
+              Following: {instagram.follows_count}
+            </div>
+            <div className="flex items-center gap-1">
+              <FaImages className="text-purple-500" />
+              Posts: {instagram.media_count}
+            </div>
+          </div>
         </div>
       )}
     </div>
