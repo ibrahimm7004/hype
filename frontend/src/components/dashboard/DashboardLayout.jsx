@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 const DashboardLayout = () => {
   return (
-    <div className="flex h-screen bg-[#0a0a0a] text-gray-300">
+    <div className="flex h-screen bg-[#0a0a0a] text-gray-700">
       {/* Sidebar */}
       <DashSidebar />
 

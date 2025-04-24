@@ -136,7 +136,12 @@ const SocialMediaAuthPage = () => {
         </div>
         {authStatus["meta/facebook"] && (
           <div>
-            <button className="mt-10 bg-gray-400 text-white p-2 w-full rounded-md hover:bg-gray-600">
+            <button
+              onClick={() => {
+                window.location = "/social-platform/manage/facebook";
+              }}
+              className="mt-10 bg-gray-400 text-white p-2 w-full rounded-md hover:bg-gray-600"
+            >
               Manage Facebook
             </button>
           </div>

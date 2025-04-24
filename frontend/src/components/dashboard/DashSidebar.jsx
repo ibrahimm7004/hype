@@ -53,6 +53,10 @@ const menuItems = [
     icon: <FaRobot />,
     path: "/social-platform/twitter/ai-marketing/meme",
   },
+  {
+    name: "GIKI",
+    path: null,
+  },
 ];
 
 const DashSidebar = () => {
