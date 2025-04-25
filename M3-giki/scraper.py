@@ -61,3 +61,14 @@ events_links = get_article_links_events(events_url)
 
 news_dict = build_articles_dict(news_links)
 events_dict = build_articles_dict(events_links)
+
+# Save the dictionaries to a txt file
+with open("output.txt", "w", encoding="utf-8") as f:
+    f.write("News Articles:\n")
+    for title, link in news_dict.items():
+        f.write(f"{title}: {link}\n")
+    
+    f.write("\nEvents Articles:\n")
+    for title, link in events_dict.items():
+        f.write(f"{title}: {link}\n")
+
