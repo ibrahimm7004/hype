@@ -91,3 +91,30 @@ class MetaToken(db.Model):
         if not self.token_expires_at:
             return False
         return datetime.utcnow() >= self.token_expires_at
+
+
+
+class FacebookPostSchedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(16), db.ForeignKey('user.user_id', ondelete="CASCADE"), nullable=False, index=True)
+    page_id = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.Text, nullable=True)  # Main text
+    link = db.Column(db.Text, nullable=True)  # Optional link
+    image_url = db.Column(db.Text, nullable=True)  # Optional image
+    scheduled_time = db.Column(db.DateTime, nullable=False)
+    posted = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return f"<FacebookPostSchedule to {self.page_id} at {self.scheduled_time}>"
+
+class InstagramPostSchedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(16), db.ForeignKey('user.user_id', ondelete="CASCADE"), nullable=False, index=True)
+    account_id = db.Column(db.String(100), nullable=False)
+    caption = db.Column(db.Text, nullable=True)
+    image_url = db.Column(db.Text, nullable=False)  # Instagram requires an image
+    scheduled_time = db.Column(db.DateTime, nullable=False)
+    posted = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return f"<InstagramPostSchedule to {self.account_id} at {self.scheduled_time}>"

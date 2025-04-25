@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import fetchData from "../../../utils/fetchData";
+import DateTimePicker from "../../utils/DateTimePicker";
 
 const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
   const [postText, setPostText] = useState(initialText);
@@ -10,6 +11,8 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
   const [charCount, setCharCount] = useState(initialText.length);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isScheduled, setIsScheduled] = useState(false);
+  const [scheduledTime, setScheduledTime] = useState(new Date());
 
   const MAX_CHAR_COUNT = 5000;
 
@@ -27,13 +30,13 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
     if (file) {
       setImagePreview(URL.createObjectURL(file));
       setImageFile(file);
-      setImageUrl(""); // clear URL input
+      setImageUrl("");
     }
   };
 
   const handleUrlChange = (e) => {
     setImageUrl(e.target.value);
-    setImageFile(null); // clear file input
+    setImageFile(null);
     setImagePreview(e.target.value);
   };
 
@@ -51,16 +54,26 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
       if (imageFile) formData.append("image_file", imageFile);
       if (imageUrl) formData.append("image_url", imageUrl);
 
+      formData.append("post_type", isScheduled ? "scheduled" : "instant");
+      if (isScheduled && scheduledTime) {
+        formData.append("scheduled_time", scheduledTime.toISOString());
+      }
+
       const response = await fetchData("/meta/facebook/post", "POST", formData);
-      console.log(response);
 
       if (response && response.status === 200) {
-        alert("Post shared successfully!");
+        alert(
+          isScheduled
+            ? "Post scheduled successfully!"
+            : "Post shared successfully!"
+        );
         setPostText("");
         setCharCount(0);
         setImagePreview("");
         setImageFile(null);
         setImageUrl("");
+        setIsScheduled(false);
+        setScheduledTime(new Date());
       } else {
         alert("Failed to post to Facebook.");
       }
@@ -162,6 +175,27 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
             />
           </div>
 
+          {/* Scheduling Toggle */}
+          <div className="mt-4 flex items-center gap-3">
+            <label className="text-sm font-medium">
+              ⏰ Schedule this post?
+            </label>
+            <input
+              type="checkbox"
+              checked={isScheduled}
+              onChange={() => setIsScheduled(!isScheduled)}
+              className="form-checkbox h-5 w-5 text-blue-600"
+            />
+          </div>
+
+          {/* DateTime Picker */}
+          {isScheduled && (
+            <DateTimePicker
+              selectedDate={scheduledTime}
+              onChange={(date) => setScheduledTime(date)}
+            />
+          )}
+
           <div className="mt-6 flex justify-end">
             <motion.button
               onClick={handlePost}
@@ -173,7 +207,13 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
               }`}
               whileTap={{ scale: 0.95 }}
             >
-              {loading ? "Posting..." : "Post to Facebook"}
+              {loading
+                ? isScheduled
+                  ? "Scheduling..."
+                  : "Posting..."
+                : isScheduled
+                ? "Schedule Post"
+                : "Post to Facebook"}
             </motion.button>
           </div>
         </div>

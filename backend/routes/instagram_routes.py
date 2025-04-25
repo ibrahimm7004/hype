@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from routes.cloudinary_routes import cloudinary_upload
 
 from mydatabase.models import MetaToken
+from utils import convert_to_pkt
+from mydatabase.models import InstagramPostSchedule
 from mydatabase.database import db  # Adjust import to your actual app structure
 
 load_dotenv()
@@ -94,21 +96,25 @@ def get_instagram_info():
 @instagram_bp.route('/post', methods=["POST"])
 @jwt_required()
 def post_to_instagram():
+
+
     current_user = get_jwt_identity()
     token = MetaToken.query.filter_by(user_id=current_user).first()
 
     if not token or not token.insta_page_id or not token.page_access_token:
         return jsonify({"error": "Instagram ID or token missing"}), 400
 
-    # Check for file upload or URL
+    # Input fields
     image_url = request.form.get("image_url")
     caption = request.form.get("caption", "")
     image_file = request.files.get("image_file")
+    post_type = request.form.get("post_type", "instant")  # default to 'instant'
+    scheduled_time = request.form.get("scheduled_time")  # Optional
 
     if not image_file and not image_url:
         return jsonify({"error": "An image file or image URL is required"}), 400
 
-    # If image file is provided, upload to Cloudinary
+    # Upload to Cloudinary if image file is given
     if image_file:
         try:
             upload_result = cloudinary_upload(image_file)
@@ -116,7 +122,32 @@ def post_to_instagram():
         except Exception as e:
             return jsonify({"error": "Failed to upload to Cloudinary", "details": str(e)}), 500
 
-    # Step 1: Create media object on Instagram
+    # Scheduled Post Logic
+    if post_type == "scheduled":
+        if not scheduled_time:
+            return jsonify({"error": "Scheduled time is required for scheduled posts."}), 400
+
+        try:
+            pkt_time = convert_to_pkt(scheduled_time)
+
+        except Exception as e:
+            return jsonify({"error": "Invalid scheduled time", "details": str(e)}), 400
+
+        # Save to InstagramPostSchedule table
+        schedule = InstagramPostSchedule(
+            user_id=current_user,
+            account_id=token.insta_page_id,
+            caption=caption,
+            image_url=image_url,
+            scheduled_time=pkt_time
+        )
+
+        db.session.add(schedule)
+        db.session.commit()
+
+        return jsonify({"message": "Instagram post scheduled successfully."}), 200
+
+    # Instant Post Logic (same as before)
     media_url = f'https://graph.facebook.com/v18.0/{token.insta_page_id}/media'
     media_payload = {
         'image_url': image_url,
@@ -132,7 +163,6 @@ def post_to_instagram():
     if not creation_id:
         return jsonify({"error": "Media ID not returned", "response": media_response}), 400
 
-    # Step 2: Publish media
     publish_url = f'https://graph.facebook.com/v18.0/{token.insta_page_id}/media_publish'
     publish_response = requests.post(publish_url, data={
         'creation_id': creation_id,

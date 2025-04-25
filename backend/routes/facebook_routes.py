@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import requests
 import os
 from dotenv import load_dotenv
-
+from utils import convert_to_pkt
 from mydatabase.models import MetaToken
 from mydatabase.database import db  # Adjust import to your actual app structure
 
@@ -161,12 +161,13 @@ def get_connected_instagram():
     return jsonify(instagram_account)
 
 
-
+from mydatabase.models import FacebookPostSchedule
+from routes.cloudinary_routes import cloudinary_upload
 
 
 @facebook_bp.route('/post', methods=["POST"])
 @jwt_required()
-def post_to_facebook():
+def create_or_schedule_facebook_post():
     current_user = get_jwt_identity()
     token = MetaToken.query.filter_by(user_id=current_user).first()
 
@@ -174,61 +175,91 @@ def post_to_facebook():
         return jsonify({"error": "Facebook page ID or token missing"}), 400
 
     data = request.form
-    file = request.files.get("image_file")  # <== added for local file support
+    file = request.files.get("image_file")
 
     message = data.get("post_text")
     link = data.get("link")
     image_url = data.get("image_url")
+    post_type = data.get("post_type", "instant")  # "instant" or "scheduled"
+    scheduled_time = data.get("scheduled_time")
 
     if not message and not link and not image_url and not file:
         return jsonify({
             "error": "At least one of 'message', 'link', 'image_url', or 'image_file' must be provided"
         }), 400
 
-    # Base post data
-    post_data = {
-        "access_token": token.page_access_token,
-        "message": message
-    }
+    if post_type == "scheduled":
+        # Upload to Cloudinary if image file is provided
+        if file:
+            try:
+                upload_result = cloudinary_upload(file)
+                image_url = upload_result["secure_url"]
+            except Exception as e:
+                return jsonify({"error": "Cloudinary upload failed", "details": str(e)}), 500
 
-    # Choose the endpoint depending on image input
-    if file:
-        # Upload image from user's device
-        photo_url = f"https://graph.facebook.com/v18.0/{token.facebook_page_id}/photos"
-        files = {
-            "source": (file.filename, file.stream, file.content_type)
-        }
-        photo_data = {
-            "caption": message,
-            "access_token": token.page_access_token
-        }
-        response = requests.post(photo_url, data=photo_data, files=files)
-    elif image_url:
-        # Upload using image URL
-        photo_url = f"https://graph.facebook.com/v18.0/{token.facebook_page_id}/photos"
-        photo_data = {
-            "url": image_url,
-            "caption": message,
-            "access_token": token.page_access_token
-        }
-        response = requests.post(photo_url, data=photo_data)
-    else:
-        # Post to feed (text and/or link only)
-        post_url = f"https://graph.facebook.com/v18.0/{token.facebook_page_id}/feed"
-        if link:
-            post_data["link"] = link
-        response = requests.post(post_url, data=post_data)
+        if not scheduled_time:
+            return jsonify({"error": "Scheduled time is required for scheduled posts"}), 400
+        
+        pkt_time = convert_to_pkt(scheduled_time)
+        print(scheduled_time)
+        print(link)
 
-    if response.status_code != 200:
+        scheduled_post = FacebookPostSchedule(
+            user_id=current_user,
+            page_id=token.facebook_page_id,
+            message=message,
+            link=link,
+            image_url=image_url,
+            scheduled_time=pkt_time,
+            posted=False
+        )
+        db.session.add(scheduled_post)
+        db.session.commit()
+
+        return jsonify({"message": "Post scheduled successfully"})
+
+    else:  # post_type == "instant"
+        # If file provided, use Facebook upload directly
+        if file:
+            photo_url = f"https://graph.facebook.com/v18.0/{token.facebook_page_id}/photos"
+            files = {
+                "source": (file.filename, file.stream, file.content_type)
+            }
+            photo_data = {
+                "caption": message,
+                "access_token": token.page_access_token
+            }
+            response = requests.post(photo_url, data=photo_data, files=files)
+
+        elif image_url:
+            photo_url = f"https://graph.facebook.com/v18.0/{token.facebook_page_id}/photos"
+            photo_data = {
+                "url": image_url,
+                "caption": message,
+                "access_token": token.page_access_token
+            }
+            response = requests.post(photo_url, data=photo_data)
+
+        else:
+            post_url = f"https://graph.facebook.com/v18.0/{token.facebook_page_id}/feed"
+            post_data = {
+                "access_token": token.page_access_token,
+                "message": message
+            }
+            if link:
+                post_data["link"] = link
+            response = requests.post(post_url, data=post_data)
+
+        if response.status_code != 200:
+            return jsonify({
+                "error": "Failed to post to Facebook",
+                "details": response.json()
+            }), 400
+
         return jsonify({
-            "error": "Failed to post to Facebook",
-            "details": response.json()
-        }), 400
-
-    return jsonify({
-        "message": "Successfully posted to Facebook",
-        "response": response.json()
-    })
+            "message": "Successfully posted to Facebook",
+            "response": response.json()
+        })
 
 
 

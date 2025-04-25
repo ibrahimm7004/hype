@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import fetchData from "../../../utils/fetchData";
+import DateTimePicker from "../../utils/DateTimePicker";
 
 const InstagramCreatePost = () => {
   const [caption, setCaption] = useState("");
@@ -9,6 +10,9 @@ const InstagramCreatePost = () => {
   const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(null);
+
+  const [schedulePost, setSchedulePost] = useState(false);
+  const [scheduledDate, setScheduledDate] = useState(null);
 
   const formRef = useRef(null);
 
@@ -26,13 +30,13 @@ const InstagramCreatePost = () => {
     if (file) {
       setImageFile(file);
       setPreview(URL.createObjectURL(file));
-      setImageUrl(""); // Clear URL input if uploading file
+      setImageUrl("");
     }
   };
 
   const handleImageUrlChange = (e) => {
     setImageUrl(e.target.value);
-    setImageFile(null); // Clear file if using URL
+    setImageFile(null);
     setPreview(e.target.value);
   };
 
@@ -44,12 +48,22 @@ const InstagramCreatePost = () => {
       return;
     }
 
+    if (schedulePost && !scheduledDate) {
+      setResponse({ error: "Please select a scheduled date and time." });
+      return;
+    }
+
     setLoading(true);
     setResponse(null);
 
     try {
       const formData = new FormData();
       formData.append("caption", caption);
+      formData.append("post_type", schedulePost ? "scheduled" : "instant");
+      if (schedulePost && scheduledDate) {
+        formData.append("scheduled_time", scheduledDate.toISOString());
+      }
+
       if (imageFile) {
         formData.append("image_file", imageFile);
       } else {
@@ -60,11 +74,17 @@ const InstagramCreatePost = () => {
       if (res.error) {
         setResponse({ error: res.error });
       } else {
-        setResponse({ success: "Post published successfully!" });
+        setResponse({
+          success: schedulePost
+            ? "Post scheduled successfully!"
+            : "Post published successfully!",
+        });
         setCaption("");
         setImageUrl("");
         setImageFile(null);
         setPreview("");
+        setScheduledDate(null);
+        setSchedulePost(false);
       }
     } catch (err) {
       setResponse({ error: "Something went wrong while posting." });
@@ -90,7 +110,7 @@ const InstagramCreatePost = () => {
         />
       </div>
 
-      {/* OR File Upload */}
+      {/* File Upload */}
       <div>
         <label className="block font-semibold mb-1">Or Upload Image</label>
         <input
@@ -121,6 +141,25 @@ const InstagramCreatePost = () => {
         />
       </div>
 
+      {/* Schedule Checkbox */}
+      <div className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          checked={schedulePost}
+          onChange={() => setSchedulePost(!schedulePost)}
+          className="accent-pink-600"
+        />
+        <label className="text-sm font-medium">📅 Schedule this post</label>
+      </div>
+
+      {/* Conditional DateTime Picker */}
+      {schedulePost && (
+        <DateTimePicker
+          selectedDate={scheduledDate}
+          onChange={setScheduledDate}
+        />
+      )}
+
       {/* Post Button */}
       <button
         onClick={handlePost}
@@ -131,7 +170,13 @@ const InstagramCreatePost = () => {
             : "bg-pink-600 hover:bg-pink-700"
         }`}
       >
-        {loading ? "Posting..." : "Post to Instagram"}
+        {loading
+          ? schedulePost
+            ? "Scheduling..."
+            : "Posting..."
+          : schedulePost
+          ? "Schedule Post"
+          : "Post to Instagram"}
       </button>
 
       {/* Response */}

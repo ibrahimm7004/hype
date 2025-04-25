@@ -12,6 +12,8 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,get_jwt
 )
+
+from utils import convert_to_pkt
 # Load environment variables
 load_dotenv()
 
@@ -223,7 +225,9 @@ def post_content():
     user_id = get_jwt_identity()
     title = data.get("title")
     text = data.get("text")
-    
+    schedule = data.get("schedule") == "true"
+    scheduled_time = data.get("scheduled_time")
+
     image = request.files.get("image")
     image_url = None
 
@@ -249,28 +253,46 @@ def post_content():
 
     reddit_username = profile_response.json().get("name")
 
+    # If image is provided, upload it
     if image:
-        # Assuming cloudinary_upload is a function you have for uploading the image
         img_upload_res = cloudinary_upload(image)
         if img_upload_res:
             image_url = img_upload_res.get("secure_url")
-            print("Image upload result:", img_upload_res)
         else:
             return jsonify({"error": "Image upload failed"}), 400
 
-    # # Fallback image URL if no upload occurs
-    # if not image_url:
-    #     image_url = 'https://res.cloudinary.com/doh1eotn4/image/upload/v1741175162/ckuyyhen4qlyshujydrh.jpg'
+    kind = "link" if image_url else "self"
+    subreddit = f"u_{reddit_username}"
 
+    # 🔁 SCHEDULED POST: Save to DB instead of immediate submission
+    if schedule and scheduled_time:
+        try:
+            scheduled_dt = convert_to_pkt(scheduled_time)
+        except ValueError:
+            return jsonify({"error": "Invalid scheduled_time format"}), 400
+
+        new_schedule = RedditPostSchedule(
+            title=title,
+            subreddit=subreddit,
+            kind=kind,
+            url=image_url if kind == "link" else None,
+            text=text if kind == "self" else None,
+            scheduled_time=scheduled_dt,
+        )
+
+        db.session.add(new_schedule)
+        db.session.commit()
+
+        return jsonify({"message": "Post scheduled successfully"}), 200
+
+    # 📤 IMMEDIATE POST
     post_data = {
         "title": title,
-        "sr": f"u_{reddit_username}",
-        "kind": "link" if image_url else "self",
-        "url": image_url,
+        "sr": subreddit,
+        "kind": kind,
+        "url": image_url if kind == "link" else None,
+        "text": text if kind == "self" else None,
     }
-
-    if text:
-        post_data["text"] = text
 
     response = requests.post("https://oauth.reddit.com/api/submit", headers=headers, data=post_data)
 
@@ -278,6 +300,7 @@ def post_content():
         return jsonify({"error": "Failed to create post", "details": response.json()}), 400
 
     return jsonify({"data": response.json(), "message": "Post created successfully"}), 200
+
 
 
 @reddit_bp.route('/posts', methods=['GET'])

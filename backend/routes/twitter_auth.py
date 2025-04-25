@@ -27,6 +27,8 @@ import cloudinary.api
 from flask import Blueprint, request, jsonify
 from dotenv import load_dotenv
 
+from utils import convert_to_pkt
+
 # Load environment variables
 load_dotenv()
 
@@ -179,34 +181,75 @@ def profile():
 @twitter_bp.route("/tweet", methods=["POST"])
 @jwt_required()
 def tweet():
-    """Post a tweet with an optional image"""
+    """Post or schedule a tweet with optional image"""
 
-    # oauth_token = request.args.get("oauth_token")
     auth_header = request.headers.get("Authorization")
-
-    tweet_text = request.form.get("tweet_text")
-    image_file = request.files.get("image")  # Get the image file from the form
-
-    if  not auth_header:
+    if not auth_header:
         return jsonify({"error": "Missing credentials"}), 400
 
     try:
         user_id = get_jwt_identity()
     except Exception as e:
         return jsonify({"error": str(e)}), 401
-    
+
     try:
         decoded_token = get_twitter_auth_from_user_id(user_id)
     except Exception as e:
         return jsonify({"error": str(e)}), 400
-    
+
     if not decoded_token:
-        return jsonify({"error": "Twitter credentials not found please authenticate your account with api"}), 400
-    
+        return jsonify({"error": "Twitter credentials not found"}), 400
+
+    tweet_text = request.form.get("tweet_text", "").strip()
+    post_type = request.form.get("schedule", "false").lower()
+    scheduled_time_str = request.form.get("scheduled_time")
+    image_file = request.files.get("image")
+
+    if not tweet_text:
+        return jsonify({"error": "Tweet text cannot be empty"}), 400
+
+    # === Case 1: Scheduled Tweet ===
+    if post_type == "true":
+        if not scheduled_time_str:
+            return jsonify({"error": "Scheduled time required"}), 400
+
+        try:
+            scheduled_time = convert_to_pkt(scheduled_time_str)
+        except ValueError:
+            return jsonify({"error": "Invalid date format"}), 400
+
+        image_url = None
+        if image_file:
+            try:
+                upload_result = cloudinary.uploader.upload(image_file)
+                print("Upload Result:", upload_result)
+                image_url = upload_result.get("secure_url")
+            except Exception as e:
+                return jsonify({"error": f"Image upload failed: {str(e)}"}), 500
+
+        scheduled_tweet = ScheduledTweet(
+            user_id=user_id,
+            tweet_text=tweet_text,
+            image_url=image_url,
+            scheduled_time=scheduled_time
+        )
+
+        try:
+            db.session.add(scheduled_tweet)
+            db.session.commit()
+            return jsonify({"message": "Tweet scheduled successfully"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"Failed to schedule tweet: {str(e)}"}), 500
+
+    # === Case 2: Immediate Tweet ===
     access_token = decoded_token["access_token"]
     access_token_secret = decoded_token["access_token_secret"]
-    
-    return post_tweet(decoded_token, tweet_text, image_file, access_token, access_token_secret)  # Call the utility function
+
+    return post_tweet(
+        decoded_token, tweet_text, image_file,
+        access_token, access_token_secret
+    )
 
 
 @twitter_bp.route("/schedule-tweet", methods=["POST"])
