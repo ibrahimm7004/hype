@@ -27,3 +27,62 @@ def convert_to_pkt(date_string):
     # Convert to Pakistan Time Zone
     return parsed_date.astimezone(pakistan_tz)
 
+
+
+# utils/scheduled_posts.py
+
+from mydatabase.models import FacebookPostSchedule, InstagramPostSchedule, RedditPostSchedule
+
+def get_facebook_scheduled_posts(user_id):
+    if not user_id:
+        return {"error": "Missing user_id"}, 400
+
+    posts = FacebookPostSchedule.query.filter_by(user_id=user_id).all()
+    scheduled_posts = [{
+        "id": post.id,
+        "page_id": post.page_id,
+        "message": post.message,
+        "link": post.link,
+        "image_url": post.image_url,
+        "scheduled_time": post.scheduled_time,
+        "posted": post.posted
+    } for post in posts]
+
+    return {"scheduled_posts": scheduled_posts}, 200
+
+
+def get_instagram_scheduled_posts(user_id):
+    if not user_id:
+        return {"error": "Missing user_id"}, 400
+
+    posts = InstagramPostSchedule.query.filter_by(user_id=user_id).all()
+    scheduled_posts = [{
+        "id": post.id,
+        "account_id": post.account_id,
+        "caption": post.caption,
+        "image_url": post.image_url,
+        "scheduled_time": post.scheduled_time,
+        "posted": post.posted
+    } for post in posts]
+
+    return {"scheduled_posts": scheduled_posts}, 200
+
+
+def get_reddit_scheduled_posts(user_id):
+    if not user_id:
+        return {"error": "Missing user_id"}, 400
+
+    posts = RedditPostSchedule.query.filter_by(user_id=user_id).all()
+    scheduled_posts = [{
+        "id": post.id,
+        "title": post.title,
+        "subreddit": post.subreddit,
+        "kind": post.kind,
+        "url": post.url,
+        "text": post.text,
+        "scheduled_time": post.scheduled_time,
+        "posted": post.posted
+    } for post in posts]
+
+    return {"scheduled_posts": scheduled_posts}, 200
+

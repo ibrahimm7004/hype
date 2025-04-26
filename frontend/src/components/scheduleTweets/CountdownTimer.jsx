@@ -28,7 +28,7 @@ const CountdownTimer = ({ scheduledTime }) => {
 
   return (
     <motion.div
-      className="flex items-center space-x-2 bg-gray-50 text-gray-600 px-3 py-1 rounded-md shadow-sm border-[1px] border-gray-300 w-[180px]"
+      className="flex items-center space-x-2 bg-gray-700 text-white px-3 py-1 rounded-md shadow-sm border-[1px] border-gray-300 w-[180px]"
       initial={{ opacity: 0, y: -5 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
@@ -52,8 +52,8 @@ const TimeBox = ({ value, label }) => {
       animate={{ scale: [1, 1.1, 1] }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
     >
-      <span className="text-md font-semibold text-gray-600">{value}</span>
-      <span className="text-[10px] uppercase tracking-widest text-gray-500">
+      <span className="text-md font-semibold text-white">{value}</span>
+      <span className="text-[10px] uppercase tracking-widest text-white">
         {label}
       </span>
     </motion.div>

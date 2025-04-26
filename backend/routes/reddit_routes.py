@@ -13,7 +13,7 @@ from flask_jwt_extended import (
     get_jwt_identity,get_jwt
 )
 
-from utils import convert_to_pkt
+from utils import convert_to_pkt, get_reddit_scheduled_posts
 # Load environment variables
 load_dotenv()
 
@@ -273,6 +273,7 @@ def post_content():
 
         new_schedule = RedditPostSchedule(
             title=title,
+            user_id=user_id,
             subreddit=subreddit,
             kind=kind,
             url=image_url if kind == "link" else None,
@@ -363,3 +364,13 @@ def get_user_posts():
         return jsonify({"error": "Failed to fetch user posts", "details": response.json()}), 400
 
     return jsonify(response.json())
+
+
+
+
+@reddit_bp.route("/scheduled-reddit-posts", methods=["GET"])
+@jwt_required()
+def scheduled_reddit_posts():
+    user_id = get_jwt_identity()
+    data, status = get_reddit_scheduled_posts(user_id)
+    return jsonify(data), status

@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from routes.cloudinary_routes import cloudinary_upload
 
 from mydatabase.models import MetaToken
-from utils import convert_to_pkt
+from utils import convert_to_pkt, get_instagram_scheduled_posts
 from mydatabase.models import InstagramPostSchedule
 from mydatabase.database import db  # Adjust import to your actual app structure
 
@@ -174,3 +174,10 @@ def post_to_instagram():
         return jsonify({"error": "Failed to publish Instagram media", "details": publish_data}), 400
 
     return jsonify({"message": "Successfully posted to Instagram", "response": publish_data})
+
+@instagram_bp.route("/scheduled-instagram-posts", methods=["GET"])
+@jwt_required()
+def scheduled_instagram_posts():
+    user_id = get_jwt_identity()
+    data, status = get_instagram_scheduled_posts(user_id)
+    return jsonify(data), status

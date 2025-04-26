@@ -74,7 +74,12 @@ const DashSidebar = () => {
       transition={{ duration: 0.5 }}
       className="h-screen w-64 bg-gradient-to-b from-purple-100 via-blue-100 to-white text-gray-800 flex flex-col p-5 shadow-lg"
     >
-      <h2 className="text-2xl font-bold text-center mb-6">Dashboard</h2>
+      <h2
+        className="text-2xl font-bold text-center mb-6 cursor-pointer "
+        onClick={() => (window.location = "/dashboard")}
+      >
+        Dashboard
+      </h2>
 
       <nav className="flex flex-col gap-2">
         {menuItems.map((item, index) => {

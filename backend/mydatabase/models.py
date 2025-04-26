@@ -58,6 +58,8 @@ class RedditUserToken(db.Model):
 
 class RedditPostSchedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(16), db.ForeignKey('user.user_id', ondelete="CASCADE"), nullable=False, index=True)
+
     title = db.Column(db.String(255), nullable=False)
     subreddit = db.Column(db.String(100), nullable=False)
     kind = db.Column(db.String(10), nullable=False)  # "self" or "link"

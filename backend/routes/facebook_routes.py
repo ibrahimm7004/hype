@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import requests
 import os
 from dotenv import load_dotenv
-from utils import convert_to_pkt
+from utils import convert_to_pkt, get_facebook_scheduled_posts
 from mydatabase.models import MetaToken
 from mydatabase.database import db  # Adjust import to your actual app structure
 
@@ -299,3 +299,13 @@ def get_facebook_page_info():
         }), 400
 
     return jsonify(response.json())
+
+
+
+
+@facebook_bp.route("/scheduled-facebook-posts", methods=["GET"])
+@jwt_required()
+def scheduled_facebook_posts():
+    user_id = get_jwt_identity()
+    data, status = get_facebook_scheduled_posts(user_id)
+    return jsonify(data), status
