@@ -27,7 +27,7 @@ UPLOAD_MEDIA_URL = 'https://upload.twitter.com/1.1/media/upload.json'
 
 
 
-scheduler = BackgroundScheduler()
+# scheduler = BackgroundScheduler()
 
 
 def check_and_post_tweets():

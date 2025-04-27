@@ -14,9 +14,20 @@ from routes.instagram_routes import instagram_bp
 from datetime import timedelta
 from Ai.meme_gen_routes import meme_gen_bp  # Import the blueprint
 from flask_session import Session
+from schedule_ultils import post_scheduled_posts
+from apscheduler.schedulers.background import BackgroundScheduler
+
 import os 
 
 app = Flask(__name__)
+
+# import logging
+# logging.basicConfig()
+# logging.getLogger('apscheduler').setLevel(logging.DEBUG)
+
+scheduler = BackgroundScheduler()
+
+
 
 # 🌍 Enable CORS with credentials
 CORS(app, supports_credentials=True)
@@ -64,6 +75,17 @@ with app.app_context():
 def hello():
     return jsonify({'message': 'Hello World! 🌍','app': 'Meme Generator API','port': '8000'})
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)  # ✅ Correct
+# if __name__ == "__main__":
+#     app.run(host="0.0.0.0", port=8000, debug=True)  # ✅ Correct
 
+# def start_scheduler():
+#     print(f"Scheduler process PID: {os.getpid()}")
+#     scheduler.add_job(post_scheduled_posts, "interval", minutes=1, max_instances=1)
+#     scheduler.start()
+    # print("Scheduler started!")
+
+if __name__ == '__main__':
+    # if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+        # start_scheduler()
+
+    app.run(host="0.0.0.0", port=8000, debug=True)

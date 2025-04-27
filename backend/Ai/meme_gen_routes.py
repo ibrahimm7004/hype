@@ -34,13 +34,14 @@ def generate_meme():
     print("Prompt QnA:", promptQna)
     
     meme_image_paths = generate_meme_from_json(promptText, promptQna)
+    
 
     if not meme_image_paths:
         return jsonify({"error": "Failed to generate memes"}), 500
-
+    
     # Generate accessible URLs for images
+    # meme_image_paths = [' /static/generated-memes/Empty-Red-And-Black_meme.jpg','/static/generated-memes/Overly-Suave-IT-Guy_meme.jpg','/static/generated-memes/McMelch_meme.jpg']
     meme_urls = [url_for('static', filename=f'generated-memes/{os.path.basename(path)}', _external=True) for path in meme_image_paths]
-
     return jsonify({"message": "Memes generated", "image_urls": meme_urls}), 200
 
 
