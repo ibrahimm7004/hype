@@ -1,65 +1,93 @@
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import {
+  Twitter,
+  Facebook,
+  Instagram,
+  // Reddit,
+  Clock,
+  RefreshCcw,
+  MessageCircle,
+} from "lucide-react";
+import ImageCarousel from "./ImageCarousel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import ImageCarousel from "./ImageCarousel";
-import { Twitter, Clock, RefreshCcw, MessageCircle } from "lucide-react";
 import TwitterCreatePost from "../SocialPlatformPage/TwitterCreatePost";
+import FacebookCreatePost from "../meta/facebook/FacebookCreatePost";
+import InstagramCreatePost from "../meta/instagram/InstagramCreatePost";
+import RedditCreatePost from "../SocialPlatformPage/RedditCreatePost";
 
-const ImageGallery = ({
-  imageUrls,
-  setInterfaceState,
-  // setSelectedImage,
-  // selectedImage,
-}) => {
-  const [selectedImage, setSelectedImage] = useState(imageUrls[0]);
-  const [autoPost, setAutoPost] = useState(false);
+const platformComponents = {
+  twitter: TwitterCreatePost,
+  facebook: FacebookCreatePost,
+  instagram: InstagramCreatePost,
+  reddit: RedditCreatePost,
+};
+
+const ImageGallery = ({ imageUrls, setInterfaceState }) => {
+  const [selectedImage, setSelectedImage] = useState(imageUrls?.[0]);
+  const [selectedPlatform, setSelectedPlatform] = useState(null);
 
   if (!imageUrls || imageUrls.length === 0) {
     return <p className="text-center text-gray-500">No images available</p>;
   }
 
   useEffect(() => {
-    console.log("selected img ", selectedImage);
+    console.log("Selected Image:", selectedImage);
   }, [selectedImage]);
+
   const postOptions = [
     {
-      label: "Auto Post",
-      descritption:
-        "Post this image to your Twitter account without any hassle.",
+      label: "Post to Twitter",
+      platform: "twitter",
+      description: "Post this image directly to your Twitter account.",
       icon: <Twitter className="w-6 h-6 text-[#1DA1F2]" />,
-      action: () => setAutoPost(!autoPost),
-      cta: "Post Now",
     },
     {
-      label: "Schedule",
-      descritption: "Schedule this image to be posted at a later time.",
-      icon: <Clock className="w-6 h-6 text-gray-500" />,
-      action: () => alert("Scheduling..."),
-      cta: "Schedule",
+      label: "Post to Facebook",
+      platform: "facebook",
+      description: "Share this image with your Facebook audience.",
+      icon: <Facebook className="w-6 h-6 text-[#1877F2]" />,
     },
+    {
+      label: "Post to Instagram",
+      platform: "instagram",
+      description: "Post this image to your Instagram feed.",
+      icon: <Instagram className="w-6 h-6 text-[#C13584]" />,
+    },
+    {
+      label: "Post to Reddit",
+      platform: "reddit",
+      description: "Post this image to your favorite subreddit.",
+      // icon: <Reddit className="w-6 h-6 text-[#FF4500]" />,
+      icon: <Clock className="w-6 h-6 text-gray-500" />,
+    },
+
     {
       label: "Re-Enter Prompt",
-      descritption: "You can re-enter the prompt to generate a new image.",
+      description: "Generate a new image by re-entering a prompt.",
       icon: <RefreshCcw className="w-6 h-6 text-green-500" />,
       action: () => setInterfaceState("textPrompt"),
-      cta: "Edit Prompt",
-    },
-    {
-      label: "Feedback",
-      descritption: "You don't like the image? Give us feedback.",
-      icon: <MessageCircle className="w-6 h-6 text-red-500" />,
-      action: () => alert("Feedback form..."),
-      cta: "Give Feedback",
     },
   ];
 
+  const handleOptionClick = (option) => {
+    if (option.platform) {
+      setSelectedPlatform(option.platform);
+    } else if (option.action) {
+      option.action();
+    }
+  };
+
+  const SelectedPostComponent = selectedPlatform
+    ? platformComponents[selectedPlatform]
+    : null;
+
   return (
     <div className="flex flex-col items-center bg-white p-6">
-      {/* Image Grid and Post Options */}
-      <div className="flex flex-col md:flex-row w-full max-w-5xl space-y-6 md:space-y-0 md:space-x-8">
+      <div className="flex flex-col md:flex-row w-full bg-green-500 space-y-6 md:space-y-0 md:space-x-8">
         {/* Options Panel */}
-        {!autoPost && (
+        {!selectedPlatform && (
           <motion.div
             className="flex flex-col w-full space-y-4"
             initial={{ opacity: 0, x: -50 }}
@@ -71,33 +99,31 @@ const ImageGallery = ({
                 key={index}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center px-4 py-6 bg-white rounded-md shadow-md cursor-pointer hover:shadow-lg transition-all border-l-4 border-[#1DA1F2] w-full"
-                onClick={option.action}
+                className="flex items-center px-4 py-6 bg-white rounded-md shadow-md cursor-pointer hover:shadow-lg transition-all border-l-4 border-indigo-500 w-full"
+                onClick={() => handleOptionClick(option)}
               >
                 <div className="mr-4">{option.icon}</div>
                 <div className="flex-grow">
-                  <p className="font-medium text-gray-900">{option.label}</p>
-                  <p className="font-light w-1/2">{option.descritption}</p>
+                  <p className="font-semibold text-gray-900">{option.label}</p>
+                  <p className="font-light w-3/4 text-sm">
+                    {option.description}
+                  </p>
                 </div>
-                {/* <motion.button
-                className="px-4 py-2 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#1A91DA] transition"
-                whileHover={{ scale: 1.05 }}
-              >
-                {option.cta}
-              </motion.button> */}
               </motion.div>
             ))}
           </motion.div>
         )}
-        {autoPost && (
-          <div>
+
+        {/* Selected Platform Post UI */}
+        {selectedPlatform && SelectedPostComponent && (
+          <div className="flex flex-col space-y-4 w-full">
             <button
-              className="bg-gray-800 text-white rounded-md px-4 py-2"
-              onClick={() => setAutoPost(false)}
+              className="self-start bg-gray-800 text-white rounded-md px-4 py-2 mb-4"
+              onClick={() => setSelectedPlatform(null)}
             >
-              Back
+              ← Back
             </button>
-            <TwitterCreatePost initialImage={selectedImage} />
+            <SelectedPostComponent initialImage={selectedImage} />
           </div>
         )}
 
@@ -115,38 +141,6 @@ const ImageGallery = ({
           />
         </motion.div>
       </div>
-      {/* Modal for Viewing Image */}
-      {/* <AnimatePresence>
-        {selectedImage && (
-          <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-          >
-            <motion.div
-              className="relative p-4 bg-white rounded-lg shadow-lg max-w-3xl"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
-                onClick={() => setSelectedImage(null)}
-              >
-                <FontAwesomeIcon icon={faXmark} size="lg" />
-              </button>
-              <img
-                src={selectedImage}
-                alt="Selected"
-                className="w-full h-auto rounded-lg"
-              />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence> */}
     </div>
   );
 };

@@ -40,6 +40,8 @@ const MemeImgGenPage = () => {
     }
   };
 
+  useEffect(() => generatePostHandler(), []);
+
   return isLoading ? (
     <CustomLoader />
   ) : (

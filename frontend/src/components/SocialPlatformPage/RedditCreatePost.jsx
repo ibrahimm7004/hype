@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faImage,
@@ -13,14 +13,33 @@ import { motion } from "framer-motion";
 import fetchData from "../../utils/fetchData";
 import DateTimePicker from "../utils/DateTimePicker";
 
-const RedditCreatePost = () => {
+const RedditCreatePost = ({ initialImage = "" }) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState(null);
   const [waiting, setWaiting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [schedule, setSchedule] = useState(false);
   const [scheduledTime, setScheduledTime] = useState(null);
+
+  const fetchImageFromUrl = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "tweet-image.jpg", { type: blob.type });
+      setImage(URL.createObjectURL(blob));
+      setImageFile(file);
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (initialImage && initialImage.startsWith("http")) {
+      fetchImageFromUrl(initialImage);
+    }
+  }, [initialImage]);
 
   const handlePostSubmit = async () => {
     if (!title.trim() || !body.trim()) {
@@ -49,8 +68,8 @@ const RedditCreatePost = () => {
     if (schedule && scheduledTime) {
       formData.append("scheduled_time", new Date(scheduledTime).toISOString());
     }
-    if (selectedFile) {
-      formData.append("image", selectedFile);
+    if (imageFile) {
+      formData.append("image", imageFile);
     }
 
     const result = await fetchData(
@@ -115,7 +134,7 @@ const RedditCreatePost = () => {
           setWaiting(false);
           setTitle("");
           setBody("");
-          setSelectedFile(null);
+          setImageFile(null);
           setSchedule(false);
           setScheduledTime(null);
         }}
@@ -195,29 +214,30 @@ const RedditCreatePost = () => {
                 <FontAwesomeIcon icon={faImage} />
                 <input
                   type="file"
-                  onChange={(e) => setSelectedFile(e.target.files[0])}
+                  onChange={(e) => setImageFile(e.target.files[0])}
                   className="hidden"
                 />
               </motion.label>
             </div>
 
             {/* Image Preview */}
-            {selectedFile && (
+            {imageFile && (
               <motion.div
                 className="mt-3 flex items-center space-x-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
-                <p className="text-sm text-gray-600">📎 {selectedFile.name}</p>
+                <p className="text-sm text-gray-600">📎 {imageFile.name}</p>
                 <motion.button
                   className="text-red-500"
                   whileHover={{ scale: 1.2 }}
-                  onClick={() => setSelectedFile(null)}
+                  onClick={() => setImageFile(null)}
                 >
                   ✖
                 </motion.button>
               </motion.div>
             )}
+            <img src={image} alt="image-preview" />
 
             {/* Schedule Post Option */}
             <div className="mt-4">
@@ -254,7 +274,7 @@ const RedditCreatePost = () => {
                 onClick={() => {
                   setTitle("");
                   setBody("");
-                  setSelectedFile(null);
+                  setImageFile(null);
                   setSchedule(false);
                   setScheduledTime(null);
                 }}

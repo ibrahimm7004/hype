@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import fetchData from "../../../utils/fetchData";
 import DateTimePicker from "../../utils/DateTimePicker";
@@ -15,7 +15,23 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
   const [scheduledTime, setScheduledTime] = useState(new Date());
 
   const MAX_CHAR_COUNT = 5000;
+  const fetchImageFromUrl = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "tweet-image.jpg", { type: blob.type });
+      setImage(URL.createObjectURL(blob));
+      setImageFile(file);
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    }
+  };
 
+  useEffect(() => {
+    if (initialImage && initialImage.startsWith("http")) {
+      fetchImageFromUrl(initialImage);
+    }
+  }, [initialImage]);
   const handleTextChange = (e) => {
     const text = e.target.value;
     setPostText(text);

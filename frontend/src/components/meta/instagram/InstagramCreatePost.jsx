@@ -3,11 +3,12 @@ import { gsap } from "gsap";
 import fetchData from "../../../utils/fetchData";
 import DateTimePicker from "../../utils/DateTimePicker";
 
-const InstagramCreatePost = () => {
+const InstagramCreatePost = ({ initialImage = "" }) => {
   const [caption, setCaption] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imageFile, setImageFile] = useState(null);
-  const [preview, setPreview] = useState("");
+
+  const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(null);
 
@@ -25,11 +26,29 @@ const InstagramCreatePost = () => {
     });
   }, []);
 
+  const fetchImageFromUrl = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "tweet-image.jpg", { type: blob.type });
+      setImage(URL.createObjectURL(blob));
+      setImageFile(file);
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (initialImage && initialImage.startsWith("http")) {
+      fetchImageFromUrl(initialImage);
+    }
+  }, [initialImage]);
+
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      setPreview(URL.createObjectURL(file));
+      setImage(URL.createObjectURL(file));
       setImageUrl("");
     }
   };
@@ -37,7 +56,7 @@ const InstagramCreatePost = () => {
   const handleImageUrlChange = (e) => {
     setImageUrl(e.target.value);
     setImageFile(null);
-    setPreview(e.target.value);
+    setImage(e.target.value);
   };
 
   const handlePost = async () => {
@@ -82,7 +101,7 @@ const InstagramCreatePost = () => {
         setCaption("");
         setImageUrl("");
         setImageFile(null);
-        setPreview("");
+        setImage("");
         setScheduledDate(null);
         setSchedulePost(false);
       }
@@ -122,10 +141,10 @@ const InstagramCreatePost = () => {
         />
       </div>
 
-      {/* Preview */}
-      {preview && (
+      {/* image */}
+      {image && (
         <div className="mt-2">
-          <img src={preview} alt="Preview" className="rounded-md max-w-full" />
+          <img src={image} alt="image" className="rounded-md max-w-full" />
         </div>
       )}
 
