@@ -46,12 +46,12 @@ const menuItems = [
   {
     name: "Text Gen",
     icon: <FaRobot />,
-    path: "/social-platform/twitter/ai-marketing/text",
+    path: "/social-platform/twitter/ai-marketing/memeText",
   },
   {
     name: "Meme Gen",
     icon: <FaRobot />,
-    path: "/social-platform/twitter/ai-marketing/meme",
+    path: "/social-platform/twitter/ai-marketing/memeImage",
   },
   {
     name: "GIKI",

@@ -102,7 +102,7 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-100 mt-10 text-gray-700">
+    <div className="flex items-center justify-center  mt-10 text-gray-700">
       <motion.div
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}

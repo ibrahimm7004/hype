@@ -1,9 +1,12 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { gsap } from "gsap";
 
 const ChatTextInput = ({ setInterfaceState, setPromptText }) => {
   const [text, setText] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false); // To handle button loading state
+  const [isGenerating, setIsGenerating] = useState(false);
   const textareaRef = useRef(null);
+  const buttonRef = useRef(null);
+  const cardRef = useRef(null);
 
   const handleChange = (event) => {
     setPromptText(event.target.value);
@@ -14,71 +17,119 @@ const ChatTextInput = ({ setInterfaceState, setPromptText }) => {
   const adjustHeight = () => {
     const textarea = textareaRef.current;
     if (textarea) {
-      textarea.style.height = "auto"; // Reset height
-      textarea.style.height = `${textarea.scrollHeight}px`; // Set to scroll height
+      textarea.style.height = "auto";
+      gsap.to(textarea, {
+        height: textarea.scrollHeight,
+        duration: 0.25,
+        ease: "power2.out",
+      });
     }
   };
 
   const handleGenerate = () => {
     setIsGenerating(true);
     setInterfaceState("qna");
-    // Simulate loading state for button
+    gsap.to(buttonRef.current, {
+      scale: 0.95,
+      duration: 0.2,
+      ease: "power1.out",
+    });
     setTimeout(() => {
+      gsap.to(buttonRef.current, {
+        scale: 1,
+        duration: 0.2,
+        ease: "power1.out",
+      });
       setIsGenerating(false);
-    }, 1000); // Simulate a delay for generating
+    }, 1200);
   };
 
+  useEffect(() => {
+    adjustHeight();
+    // Animate card on mount
+    gsap.from(cardRef.current, {
+      y: 30,
+      opacity: 0,
+      duration: 0.6,
+      ease: "power2.out",
+    });
+  }, []);
+
   return (
-    <div className="mx-auto p-8 rounded-lg min-h-[400px] max-w-xl w-full">
-      <p className="text-gray-700 text-md font-light italic">
-        <span className="font-semibold">Example: </span>
-        Type a question, and we'll provide a response!
-      </p>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="text-center text-gray-700 mb-8">
+        <h1 className="font-bold text-4xl mb-3 tracking-tight">
+          Generate Post
+        </h1>
+        <p className="w-full max-w-md text-md font-light text-gray-500 mx-auto leading-relaxed">
+          Enter your prompt below and we’ll craft a perfect marketing post with
+          a title, body, and hashtags to boost your reach!
+        </p>
+      </div>
 
-      <textarea
-        ref={textareaRef}
-        value={text}
-        onChange={handleChange}
-        placeholder="Enter your prompt here..."
-        className="border border-gray-300 font-light w-full mt-4 outline-none text-gray-800 text-md rounded-lg px-4 py-2 resize-none overflow-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
-        rows={1}
-        style={{ minHeight: "40px" }}
-      />
+      <div
+        ref={cardRef}
+        className="w-full max-w-xl p-6 rounded-2xl border border-gray-200 bg-white shadow-xl transition-all"
+      >
+        <p className="text-gray-400 text-sm font-light italic mb-2">
+          <span className="font-semibold text-gray-600">Example: </span>
+          "What's a catchy Instagram post for a coffee shop?"
+        </p>
 
-      <div className="mt-4 flex justify-between items-center">
-        <div className="text-xs text-gray-600">{text.length} / 300</div>
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={handleChange}
+          placeholder="Type your prompt here..."
+          className="w-full font-light mt-3 outline-none text-gray-700 text-base rounded-xl px-4 py-3 resize-none overflow-hidden bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all duration-300"
+          rows={1}
+          maxLength={300}
+          style={{ minHeight: "50px" }}
+        />
 
-        <button
-          onClick={handleGenerate}
-          className={`text-white ${
-            isGenerating
-              ? "bg-gray-500"
-              : "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-purple-600 hover:to-indigo-500"
-          } transition duration-300 text-sm font-semibold rounded-md px-6 py-3 flex items-center space-x-2`}
-          disabled={isGenerating}
-        >
-          {isGenerating ? (
-            <>
-              <svg
-                className="animate-spin h-5 w-5 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6v6h6m0 0L4 6m6 6l6 6M10 6h4m0 0l6 6M10 6l6-6"
-                />
-              </svg>
-              <span>Generating...</span>
-            </>
-          ) : (
-            <span>Generate</span>
-          )}
-        </button>
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-xs text-gray-400">{text.length} / 300</div>
+
+          <button
+            ref={buttonRef}
+            onClick={handleGenerate}
+            className={`text-white ${
+              isGenerating
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-br from-indigo-400 to-purple-500 hover:from-purple-400 hover:to-indigo-500"
+            } px-6 py-2 rounded-full text-sm font-semibold shadow-md flex items-center gap-2 transition-transform transform hover:scale-105 active:scale-95`}
+            disabled={isGenerating}
+          >
+            {isGenerating ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  ></path>
+                </svg>
+                <span>Generating...</span>
+              </>
+            ) : (
+              <span>Generate</span>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

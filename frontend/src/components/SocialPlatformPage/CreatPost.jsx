@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import RedditCreatePost from "./RedditCreatePost";
 import TwitterCreatePost from "./TwitterCreatePost";
+import FacebookCreatePost from "../meta/facebook/FacebookCreatePost";
+import InstagramCreatePost from "../meta/instagram/InstagramCreatePost";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faReddit,
@@ -9,36 +11,39 @@ import {
   faInstagram,
 } from "@fortawesome/free-brands-svg-icons";
 import { gsap } from "gsap";
-import FacebookCreatePost from "../meta/facebook/FacebookCreatePost";
-import InstagramCreatePost from "../meta/instagram/InstagramCreatePost";
+import clsx from "clsx"; // (npm install clsx)
 
 const platforms = [
   {
     key: "reddit",
     name: "Reddit",
     icon: faReddit,
-    color: "orange-500",
+    color: "bg-orange-500",
+    textColor: "text-orange-500",
     component: <RedditCreatePost />,
   },
   {
     key: "twitter",
     name: "Twitter",
     icon: faTwitter,
-    color: "blue-500",
+    color: "bg-blue-400",
+    textColor: "text-blue-400",
     component: <TwitterCreatePost />,
   },
   {
     key: "facebook",
     name: "Facebook",
     icon: faFacebook,
-    color: "blue-600",
+    color: "bg-blue-600",
+    textColor: "text-blue-600",
     component: <FacebookCreatePost />,
   },
   {
     key: "instagram",
     name: "Instagram",
     icon: faInstagram,
-    color: "pink-600",
+    color: "bg-pink-500",
+    textColor: "text-pink-500",
     component: <InstagramCreatePost />,
   },
 ];
@@ -68,35 +73,36 @@ const CreatePost = () => {
   const selected = platforms.find((p) => p.key === platform);
 
   return (
-    <div className="w-full max-w-5xl mx-auto mt-12 p-8 bg-white shadow-2xl rounded-2xl">
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-        Create a Post
-      </h1>
+    <div className="w-full  bg-gradient-to-br from-pink-50 via-blue-50 to-white p-8 md:p-12 rounded-md">
+      {/* <h1 className="text-4xl font-extrabold text-center mb-8 text-gray-800 tracking-tight">
+        Create a Post ✍️
+      </h1> */}
 
       {/* Platform Toggle */}
       <div
         ref={toggleRef}
-        className="flex justify-center flex-wrap bg-gray-100 rounded-full p-3 mb-8 gap-4 shadow-inner"
+        className="flex justify-center flex-wrap gap-4 mb-12 mx-auto"
       >
         {platforms.map((p) => (
           <button
             key={p.key}
             onClick={() => setPlatform(p.key)}
-            className={`flex items-center px-5 py-2 rounded-full transition duration-300 font-medium 
-              ${
-                platform === p.key
-                  ? `bg-${p.color} text-white shadow-lg`
-                  : "text-gray-600 hover:text-black hover:bg-gray-200"
-              }`}
+            className={clsx(
+              "flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm",
+              platform === p.key
+                ? `${p.color} text-white shadow-md scale-105`
+                : `bg-white ${p.textColor} border border-gray-300 hover:bg-gray-100`
+            )}
           >
-            <FontAwesomeIcon icon={p.icon} className="mr-2" />
+            <FontAwesomeIcon icon={p.icon} />
             {p.name}
           </button>
         ))}
       </div>
 
       {/* Form Section */}
-      <div ref={formRef}>{selected ? selected.component : null}</div>
+
+      {selected ? selected.component : null}
     </div>
   );
 };
