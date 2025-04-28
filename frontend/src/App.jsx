@@ -33,6 +33,7 @@ import RedditCallback from "./components/SocialPlatformPage/RedditCallback";
 import UserFacebookPageList from "./components/meta/facebook/UserFacebookPageList";
 import SaveInstagramId from "./components/meta/instagram/SaveInstagramId";
 import FacebookCallback from "./components/SocialPlatformPage/FacebookCallback";
+import GikiCampaignPage from "./pages/GikiCampaignPage";
 
 const App = () => (
   <BrowserRouter>
@@ -41,7 +42,10 @@ const App = () => (
       {/* Landing Page */}
       <Route path="/" element={<LandingPage />} />
 
-      <Route path="meta"></Route>
+      <Route path="giki" element={<DashboardLayout />}>
+        <Route path="" element={<GikiCampaignPage />} />
+      </Route>
+
       {/* Authentication and Dashboard Routes */}
       <Route path="/social-platform" element={<DashboardLayout />}>
         <Route path="manage">

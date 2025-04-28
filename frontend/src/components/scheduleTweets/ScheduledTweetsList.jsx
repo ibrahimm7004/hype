@@ -152,7 +152,7 @@ const ScheduledPostsList = () => {
   };
 
   return (
-    <div className="p-6 px-24 w-full bg-gradient-to-br from-pink-100 via-blue-100 to-white rounded-md mx-screen">
+    <div className="p-6 px-24 w-full bg-gradient-to-br from-pink-100 via-blue-100 to-white rounded-md mx-auto">
       <h1 className="text-3xl font-bold text-center mb-8 text-gray-700">
         Scheduled Posts
       </h1>

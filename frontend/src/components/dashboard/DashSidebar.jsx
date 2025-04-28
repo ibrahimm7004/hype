@@ -57,6 +57,11 @@ const menuItems = [
     name: "GIKI",
     path: null,
   },
+  {
+    name: "Campaign",
+    icon: <FaHome />,
+    path: "/giki",
+  },
 ];
 
 const DashSidebar = () => {
