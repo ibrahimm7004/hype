@@ -1,27 +1,32 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState, useRef } from "react";
+import gsap from "gsap";
 import {
   FaReddit,
   FaUser,
   FaCalendar,
   FaCheckCircle,
   FaSyncAlt,
+  FaUserFriends,
+  FaImages,
 } from "react-icons/fa";
 import fetchData from "../../utils/fetchData";
 import RedditFeed from "./RedditFeed";
 
+const STORAGE_KEY = "meta/reddit_profile";
+
 const RedditProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
+  const containerRef = useRef();
 
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      setError(null);
+      setError("");
 
       const user_id = localStorage.getItem("user_id");
-      const storedProfile = localStorage.getItem("reddit_profile");
+      const storedProfile = localStorage.getItem(STORAGE_KEY);
 
       if (storedProfile) {
         setProfile(JSON.parse(storedProfile));
@@ -36,10 +41,7 @@ const RedditProfile = () => {
 
       if (profileData?.data) {
         setProfile(profileData.data);
-        localStorage.setItem(
-          "reddit_profile",
-          JSON.stringify(profileData.data)
-        );
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData.data));
       } else {
         setError("Invalid profile data received.");
       }
@@ -55,25 +57,26 @@ const RedditProfile = () => {
     fetchProfile();
   }, []);
 
+  useEffect(() => {
+    if (profile) {
+      gsap.fromTo(
+        containerRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+      );
+    }
+  }, [profile]);
+
   const handleRefresh = () => {
-    localStorage.removeItem("reddit_profile");
+    localStorage.removeItem(STORAGE_KEY);
     fetchProfile();
   };
 
-  const handleViewProfile = () => {
-    if (profile?.name) {
-      window.open(`https://www.reddit.com/user/${profile.name}`, "_blank");
-    }
-  };
-
   if (loading)
-    return (
-      <div className="text-center p-8 text-gray-500">Loading profile...</div>
-    );
+    return <div className="text-center text-sm text-gray-500">Loading...</div>;
 
-  if (error) return <div className="text-center p-8 text-red-500">{error}</div>;
-
-  if (!profile) return null;
+  if (error)
+    return <div className="text-center text-sm text-red-500 mt-4">{error}</div>;
 
   const {
     name,
@@ -83,96 +86,82 @@ const RedditProfile = () => {
     created_utc,
     verified,
     snoovatar_img,
-    subreddit,
   } = profile;
 
   const accountCreationDate = new Date(created_utc * 1000).toLocaleDateString();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="w-full max-w-3xl mx-auto mt-10 p-6 bg-white shadow-xl rounded-2xl border border-gray-200"
+    <div
+      ref={containerRef}
+      className="mt-6 p-6 bg-gray-50 rounded-xl shadow-inner border space-y-4 w-5/6 mx-auto"
     >
-      <div className="flex items-center space-x-6">
-        {snoovatar_img && (
-          <img
-            src={snoovatar_img}
-            alt="Snoovatar"
-            className="w-20 h-20 rounded-full border-2 border-orange-500"
-          />
-        )}
-        <div>
-          <div className="flex items-center gap-2 text-2xl font-semibold text-gray-800">
-            <FaUser className="text-orange-500" />
-            {name}
-            {verified && (
-              <FaCheckCircle className="text-green-500" title="Verified" />
-            )}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          {snoovatar_img && (
+            <img
+              src={snoovatar_img}
+              alt="Snoovatar"
+              className="w-20 h-20 rounded-full border-2 border-orange-500"
+            />
+          )}
+          <div>
+            <div className="text-xl font-bold text-gray-800">
+              @{name}
+              {verified && (
+                <FaCheckCircle
+                  className="text-green-500 inline ml-2"
+                  title="Verified"
+                />
+              )}
+            </div>
+            <div className="text-gray-600">{name}</div>
+            <p className="text-sm text-gray-500 mt-1">
+              {profile.biography || "No biography available."}
+            </p>
           </div>
-          <p className="text-gray-500 flex items-center mt-1">
-            <FaCalendar className="mr-2" /> Joined: {accountCreationDate}
-          </p>
+        </div>
 
-          <button
-            onClick={handleRefresh}
-            className="mt-3 px-3 py-1 bg-gray-100 hover:bg-gray-200 text-sm text-gray-700 rounded-full flex items-center gap-1 transition"
-          >
-            <FaSyncAlt className="text-gray-500" />
-            Refresh
-          </button>
+        <button
+          onClick={handleRefresh}
+          className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition"
+          title="Refresh"
+        >
+          <FaSyncAlt />
+        </button>
+      </div>
+
+      <div className="flex justify-around mt-4 text-center text-sm text-gray-700 font-medium">
+        <div className="flex items-center gap-1">
+          <FaUserFriends className="text-blue-500" />
+          Karma: {total_karma}
+        </div>
+        <div className="flex items-center gap-1">
+          <FaImages className="text-purple-500" />
+          Comments: {comment_karma}
+        </div>
+        <div className="flex items-center gap-1">
+          <FaUser className="text-green-500" />
+          Posts: {link_karma}
         </div>
       </div>
 
-      {/* Karma Stats */}
-      <div className="mt-6 grid grid-cols-3 gap-4 text-center">
-        <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
-          <p className="text-xl font-bold text-orange-600">{total_karma}</p>
-          <p className="text-sm text-gray-500">Total Karma</p>
-        </div>
-        <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
-          <p className="text-xl font-bold text-blue-600">{comment_karma}</p>
-          <p className="text-sm text-gray-500">Comment Karma</p>
-        </div>
-        <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
-          <p className="text-xl font-bold text-purple-600">{link_karma}</p>
-          <p className="text-sm text-gray-500">Post Karma</p>
-        </div>
-      </div>
-
-      {/* Subreddit Info */}
-      {subreddit && (
-        <div className="mt-6 bg-gray-100 rounded-lg p-4 text-center shadow-inner">
-          <h3 className="text-lg font-medium text-gray-800 mb-1">
-            Subreddit Info
-          </h3>
-          <p className="text-gray-700 font-medium">
-            {subreddit.display_name_prefixed}
-          </p>
-          <p className="text-sm text-gray-500">
-            Subscribers: {subreddit.subscribers}
-          </p>
-        </div>
-      )}
-
-      {/* Feed */}
+      {/* Reddit Feed */}
       <div className="mt-8">
         <RedditFeed />
       </div>
 
       {/* View Profile Button */}
-      <div className="mt-6 text-center">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-6 py-2 bg-orange-500 text-white rounded-lg flex items-center justify-center gap-2 mx-auto shadow hover:bg-orange-600 transition"
-          onClick={handleViewProfile}
+      <div className="mt-8 text-center">
+        <button
+          className="px-8 py-3 bg-orange-500 text-white rounded-full flex items-center justify-center gap-3 mx-auto shadow-lg hover:bg-orange-600 transition"
+          onClick={() =>
+            window.open(`https://www.reddit.com/user/${name}`, "_blank")
+          }
         >
           <FaReddit /> View Reddit Profile
-        </motion.button>
+        </button>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
