@@ -28,6 +28,7 @@ const RedditCallback = () => {
         setError(err.message);
       } finally {
         setLoading(false);
+        localStorage.setItem("reddit_authenticated", "true");
 
         // Redirect to Reddit Profile Page
         window.location.href = "/social-platform/profiles";

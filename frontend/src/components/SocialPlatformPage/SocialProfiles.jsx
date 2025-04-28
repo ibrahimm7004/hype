@@ -2,19 +2,17 @@ import React, { useState } from "react";
 import RedditProfile from "./RedditProfile";
 import TwitterProfile from "./TwitterProfile";
 import FacebookProfile from "./FacebookProfile";
-
+import InstagramProfile from "../meta/instagram/InstagramProfile";
 import { motion } from "framer-motion";
 
-import InstagramProfile from "../meta/instagram/InstagramProfile";
-
 const profiles = [
-  { name: "Reddit", component: <RedditProfile />, color: "text-orange-600" },
-  { name: "Twitter", component: <TwitterProfile />, color: "text-blue-400" },
-  { name: "Facebook", component: <FacebookProfile />, color: "text-blue-600" },
+  { name: "Reddit", component: <RedditProfile />, color: "orange-600" },
+  { name: "Twitter", component: <TwitterProfile />, color: "blue-400" },
+  { name: "Facebook", component: <FacebookProfile />, color: "blue-600" },
   {
     name: "Instagram",
     component: <InstagramProfile />,
-    color: "text-pink-500",
+    color: "pink-500",
   },
 ];
 
@@ -22,19 +20,19 @@ const SocialProfiles = () => {
   const [activeTab, setActiveTab] = useState("Reddit");
 
   return (
-    <div className="w-full  bg-white shadow-xl rounded-lg p-6">
+    <div className="w-full bg-gradient-to-br from-pink-100 via-blue-100 to-white rounded-xl p-8  mx-auto">
       {/* Tab Navigation */}
-      <div className="flex justify-around border-b pb-3">
+      <div className="flex justify-between border-2 bg-white/60 hover:bg-white transition border-gray-200 rounded-full px-10 py-2 mb-6 w-1/2 mx-auto">
         {profiles.map(({ name, color }) => (
           <motion.button
             key={name}
-            className={`flex-1 text-lg font-semibold py-2 transition-all ${
+            className={`flex-1 text-md font-medium py-1 transition-all duration-200 ${
               activeTab === name
-                ? `${color} border-b-2 border-current`
-                : "text-gray-500"
+                ? `bg-${color} text-white rounded-full`
+                : "text-gray-600"
             }`}
             onClick={() => setActiveTab(name)}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.98 }}
           >
             {name}
           </motion.button>

@@ -6,6 +6,9 @@ import {
   faChevronDown,
   faClock,
   faCheck,
+  faThumbsUp,
+  faComment,
+  faShare,
 } from "@fortawesome/free-solid-svg-icons";
 import CountdownTimer from "./CountdownTimer";
 
@@ -34,34 +37,31 @@ const ScheduledPostCard = ({ post, isExpanded, onExpand }) => {
 
   return (
     <motion.div
-      className="bg-gradient-to-br from-purple-100 via-indigo-50 to-blue-100 rounded-2xl p-6 shadow-md cursor-pointer overflow-hidden"
+      className="bg-white rounded-xl p-4 shadow-md cursor-pointer overflow-hidden border border-gray-200 max-w-xs w-full"
       variants={cardVariants}
       initial="rest"
       whileHover="hover"
       whileTap="tap"
       onClick={onExpand}
     >
+      {/* Countdown Timer at the top */}
+      {post.scheduled_time && !post.posted && (
+        <div className="flex items-center text-sm text-gray-500 mb-3">
+          <FontAwesomeIcon icon={faClock} className="mr-1" />
+          <CountdownTimer scheduledTime={post.scheduled_time} />
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <FontAwesomeIcon
-            icon={faCalendar}
-            className="text-indigo-400 text-lg"
-          />
-          <h2
-            className="font-semibold text-gray-800 text-base line-clamp-1 max-w-xs"
-            title={getTitle()}
-          >
-            {getTitle().length > 60
-              ? `${getTitle().substring(0, 60)}...`
-              : getTitle()}
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex flex-col">
+          <h2 className="font-semibold text-lg text-gray-800">
+            {post.user_name}
           </h2>
-          {!post.posted && post.scheduled_time && (
-            <div className="flex items-center gap-1 text-sm text-gray-500 w-full">
-              <FontAwesomeIcon icon={faClock} />
-              <CountdownTimer scheduledTime={post.scheduled_time} />
-            </div>
-          )}
+          <div className="flex items-center text-xs text-gray-500">
+            <span>@{post.user_username}</span> •{" "}
+            <span>{new Date(post.scheduled_time).toLocaleDateString()}</span>
+          </div>
         </div>
 
         {/* Expand Icon */}
@@ -78,6 +78,41 @@ const ScheduledPostCard = ({ post, isExpanded, onExpand }) => {
         </motion.div>
       </div>
 
+      {/* Post Content */}
+      <div className="mt-2">
+        <h3
+          className="font-medium text-gray-800 text-sm line-clamp-2"
+          title={getTitle()}
+        >
+          {getTitle().length > 100
+            ? `${getTitle().substring(0, 100)}...`
+            : getTitle()}
+        </h3>
+
+        {/* Image or Media Preview */}
+        {post.image_url && (
+          <motion.img
+            src={post.image_url}
+            alt="Preview"
+            className="mt-2 w-full h-60 object-cover rounded-lg bg-white"
+            whileHover={{ scale: 1.03 }}
+            transition={{ duration: 0.3 }}
+          />
+        )}
+
+        {/* External Link */}
+        {post.url && (
+          <a
+            href={post.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block text-indigo-600 underline text-xs hover:text-indigo-800 mt-2"
+          >
+            View Link
+          </a>
+        )}
+      </div>
+
       {/* Expandable Content */}
       <AnimatePresence>
         {isExpanded && (
@@ -86,43 +121,34 @@ const ScheduledPostCard = ({ post, isExpanded, onExpand }) => {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="mt-4 space-y-4"
+            className="mt-2 space-y-2"
           >
-            <p className="text-gray-600 text-sm leading-relaxed">
-              {getTitle()}
-            </p>
-
-            {post.image_url && (
-              <motion.img
-                src={post.image_url}
-                alt="Preview"
-                className="w-full h-56 object-cover rounded-xl bg-white"
-                whileHover={{ scale: 1.03 }}
-                transition={{ duration: 0.3 }}
-              />
-            )}
-
-            {post.url && (
-              <a
-                href={post.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block text-indigo-600 underline text-sm hover:text-indigo-800"
-              >
-                View Link
-              </a>
-            )}
+            <p className="text-gray-600 text-xs">{getTitle()}</p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between mt-6">
+      {/* Footer (Interactions) */}
+      <div className="flex items-center justify-between mt-4 border-t border-gray-200 pt-3 text-xs text-gray-500">
+        <div className="flex gap-3">
+          <div className="flex items-center gap-1 cursor-pointer hover:text-blue-500">
+            <FontAwesomeIcon icon={faThumbsUp} />
+            {/* <span>{post.likes || 0}</span> */}
+          </div>
+          <div className="flex items-center gap-1 cursor-pointer hover:text-blue-500">
+            <FontAwesomeIcon icon={faComment} />
+            {/* <span>{post.comments || 0}</span> */}
+          </div>
+          <div className="flex items-center gap-1 cursor-pointer hover:text-blue-500">
+            <FontAwesomeIcon icon={faShare} />
+            {/* <span>{post.shares || 0}</span> */}
+          </div>
+        </div>
         <span
-          className={`px-4 py-1 text-xs font-semibold rounded-full bg-gradient-to-r ${
+          className={`px-3 py-1 text-xs font-semibold rounded-full ${
             post.posted
-              ? "from-green-200 to-green-100 text-green-800"
-              : "from-yellow-200 to-yellow-100 text-yellow-800"
+              ? "bg-green-100 text-green-700"
+              : "bg-yellow-100 text-yellow-700"
           }`}
         >
           <FontAwesomeIcon
@@ -130,9 +156,6 @@ const ScheduledPostCard = ({ post, isExpanded, onExpand }) => {
             className="mr-1"
           />
           {post.posted ? "Posted" : "Scheduled"}
-        </span>
-        <span className="text-xs font-semibold text-gray-500 uppercase">
-          {post.platform}
         </span>
       </div>
     </motion.div>

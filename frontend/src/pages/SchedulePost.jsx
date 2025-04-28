@@ -8,19 +8,17 @@ const SchedulePost = () => {
   const [activeTab, setActiveTab] = useState("list");
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+    <div className="flex flex-col items-center justify-center">
       {/* Card Container */}
-      <div className="  bg-white shadow-lg rounded-lg p-6">
-        {/* Dynamic Content */}
-        <motion.div
-          className="mt-4"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <ScheduledTweetsList />
-        </motion.div>
-      </div>
+
+      {/* Dynamic Content */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <ScheduledTweetsList />
+      </motion.div>
     </div>
   );
 };
