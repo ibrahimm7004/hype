@@ -215,12 +215,12 @@ const PromptQna = ({ setPromptQna, generatePostHandler }) => {
                 <label
                   key={index}
                   className="flex items-center cursor-pointer p-2 hover:bg-gray-100 rounded-md"
-                  htmlFor={option}
+                  htmlFor={`${q.id}_${index}`}
                 >
                   <input
                     multiple={true}
                     type="checkbox"
-                    id={option}
+                    id={`${q.id}_${index}`}
                     value={option}
                     onChange={(e) =>
                       handleChange(q.id, option, e.target.checked)

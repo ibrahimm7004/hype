@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import {
-  Twitter,
-  Facebook,
-  Instagram,
-  // Reddit,
-  Clock,
-  RefreshCcw,
-  MessageCircle,
-} from "lucide-react";
-import ImageCarousel from "./ImageCarousel";
+import React, { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faTwitter,
+  faFacebook,
+  faInstagram,
+  faReddit,
+} from "@fortawesome/free-brands-svg-icons";
+import {
+  faClock,
+  faRotateRight,
+  faCommentDots,
+  faArrowLeft,
+} from "@fortawesome/free-solid-svg-icons";
+import ImageCarousel from "./ImageCarousel";
 import TwitterCreatePost from "../SocialPlatformPage/TwitterCreatePost";
 import FacebookCreatePost from "../meta/facebook/FacebookCreatePost";
 import InstagramCreatePost from "../meta/instagram/InstagramCreatePost";
@@ -27,46 +29,67 @@ const platformComponents = {
 const ImageGallery = ({ imageUrls, setInterfaceState }) => {
   const [selectedImage, setSelectedImage] = useState(imageUrls?.[0]);
   const [selectedPlatform, setSelectedPlatform] = useState(null);
-
-  if (!imageUrls || imageUrls.length === 0) {
-    return <p className="text-center text-gray-500">No images available</p>;
-  }
+  const optionsRef = useRef(null);
+  const carouselRef = useRef(null);
 
   useEffect(() => {
-    console.log("Selected Image:", selectedImage);
-  }, [selectedImage]);
+    if (optionsRef.current) {
+      gsap.from(optionsRef.current, {
+        opacity: 0,
+        x: -30,
+        duration: 0.8,
+        ease: "power2.out",
+      });
+    }
+    if (carouselRef.current) {
+      gsap.from(carouselRef.current, {
+        opacity: 0,
+        x: 30,
+        duration: 0.8,
+        ease: "power2.out",
+        delay: 0.2,
+      });
+    }
+  }, [selectedPlatform]);
+
+  if (!imageUrls || imageUrls.length === 0) {
+    return <p className="text-center text-gray-400">No images available</p>;
+  }
 
   const postOptions = [
     {
       label: "Post to Twitter",
       platform: "twitter",
       description: "Post this image directly to your Twitter account.",
-      icon: <Twitter className="w-6 h-6 text-[#1DA1F2]" />,
+      icon: faTwitter,
+      color: "#1DA1F2",
     },
     {
       label: "Post to Facebook",
       platform: "facebook",
       description: "Share this image with your Facebook audience.",
-      icon: <Facebook className="w-6 h-6 text-[#1877F2]" />,
+      icon: faFacebook,
+      color: "#1877F2",
     },
     {
       label: "Post to Instagram",
       platform: "instagram",
       description: "Post this image to your Instagram feed.",
-      icon: <Instagram className="w-6 h-6 text-[#C13584]" />,
+      icon: faInstagram,
+      color: "#C13584",
     },
     {
       label: "Post to Reddit",
       platform: "reddit",
       description: "Post this image to your favorite subreddit.",
-      // icon: <Reddit className="w-6 h-6 text-[#FF4500]" />,
-      icon: <Clock className="w-6 h-6 text-gray-500" />,
+      icon: faReddit,
+      color: "#FF4500",
     },
-
     {
       label: "Re-Enter Prompt",
       description: "Generate a new image by re-entering a prompt.",
-      icon: <RefreshCcw className="w-6 h-6 text-green-500" />,
+      icon: faRotateRight,
+      color: "#10B981", // emerald green
       action: () => setInterfaceState("textPrompt"),
     },
   ];
@@ -84,62 +107,51 @@ const ImageGallery = ({ imageUrls, setInterfaceState }) => {
     : null;
 
   return (
-    <div className="flex flex-col items-center bg-white p-6">
-      <div className="flex flex-col md:flex-row w-full bg-green-500 space-y-6 md:space-y-0 md:space-x-8">
+    <div className="flex flex-col items-center bg-gray-50 min-h-screen p-8">
+      <div className="flex flex-col md:flex-row w-full max-w-6xl space-y-8 md:space-y-0 md:space-x-8">
         {/* Options Panel */}
         {!selectedPlatform && (
-          <motion.div
-            className="flex flex-col w-full space-y-4"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <div className="flex flex-col w-full space-y-5" ref={optionsRef}>
             {postOptions.map((option, index) => (
-              <motion.div
+              <div
                 key={index}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center px-4 py-6 bg-white rounded-md shadow-md cursor-pointer hover:shadow-lg transition-all border-l-4 border-indigo-500 w-full"
+                className="flex items-center p-5 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all cursor-pointer"
                 onClick={() => handleOptionClick(option)}
               >
-                <div className="mr-4">{option.icon}</div>
-                <div className="flex-grow">
-                  <p className="font-semibold text-gray-900">{option.label}</p>
-                  <p className="font-light w-3/4 text-sm">
-                    {option.description}
-                  </p>
+                <div className="mr-4 text-xl" style={{ color: option.color }}>
+                  <FontAwesomeIcon icon={option.icon} />
                 </div>
-              </motion.div>
+                <div className="flex-grow">
+                  <p className="font-semibold text-gray-800">{option.label}</p>
+                  <p className="text-gray-500 text-sm">{option.description}</p>
+                </div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         )}
 
         {/* Selected Platform Post UI */}
         {selectedPlatform && SelectedPostComponent && (
-          <div className="flex flex-col space-y-4 w-full">
+          <div className="flex flex-col w-full space-y-6" ref={optionsRef}>
             <button
-              className="self-start bg-gray-800 text-white rounded-md px-4 py-2 mb-4"
+              className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
               onClick={() => setSelectedPlatform(null)}
             >
-              ← Back
+              <FontAwesomeIcon icon={faArrowLeft} />
+              <span>Back</span>
             </button>
             <SelectedPostComponent initialImage={selectedImage} />
           </div>
         )}
 
         {/* Image Carousel */}
-        <motion.div
-          className="w-full md:w-2/3"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div className="w-full md:w-2/3" ref={carouselRef}>
           <ImageCarousel
             imageUrls={imageUrls}
-            setSelectedImage={setSelectedImage}
             selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
           />
-        </motion.div>
+        </div>
       </div>
     </div>
   );

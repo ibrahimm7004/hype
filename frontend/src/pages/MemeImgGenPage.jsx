@@ -52,7 +52,7 @@ const MemeImgGenPage = () => {
   return isLoading ? (
     <CustomLoader />
   ) : (
-    <div className="flex flex-col items-center justify-center bg-gray-100 py-8 px-4  sm:px-6 md:px-8">
+    <div className="flex flex-col items-center justify-center bg-gray-100 py-8 px-4 bg-gradient-to-br from-pink-100 via-blue-100 to-white rounded-lg  sm:px-6 md:px-8">
       {/* Main container */}
       {interfaceState !== "gallery" && (
         <div className="bg-white rounded-lg shadow-lg w-full p-8">
