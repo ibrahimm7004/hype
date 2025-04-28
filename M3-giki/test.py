@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import urllib3
 from datetime import datetime
-import json
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -28,30 +27,11 @@ def get_article_links_events(page_url):
     return [a['href'] for a in soup.select('h3.tribe-events-calendar-list__event-title a')]
 
 
-
-
-def get_new_data(url):
-    """Extract full readable text from a single article page and return as a JSON object."""
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-    
+def get_article_text(url):
+    """Extract full readable text from a single article page."""
     res = requests.get(url, headers=headers, verify=False)
     soup = BeautifulSoup(res.content, 'html.parser')
-    
-    # Extract title (first h1 tag with class 'kingster-single-article-title')
-    title = soup.find('h1', class_='kingster-single-article-title')
-    if title:
-        title_text = title.text.strip()
-    else:
-        title_text = "Title not found"
-    
-    # Extract date (find the div with the class 'kingster-blog-info-date' and get the text inside <a>)
-    date_div = soup.find('div', class_='kingster-blog-info kingster-blog-info-font kingster-blog-info-date post-date updated')
-    if date_div:
-        date = date_div.find('a').text.strip()
-    else:
-        date = "Date not found"
-    
-    # Extract content
+
     possible_divs = [
         soup.find('div', class_='kingster-single-article-content'),
         soup.find('div', class_='gdlr-core-blog-content'),
@@ -62,22 +42,50 @@ def get_new_data(url):
     for div in possible_divs:
         if div:
             paragraphs = div.find_all(['p', 'div', 'li'])
-            text_content = "\n".join(p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True))
-            break
+            return "\n".join(p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True))
+
+    return "No content found"
+
+
+def build_articles_dict(link_list):
+    data = {}
+    for i, url in enumerate(link_list):
+        try:
+            text = get_article_text(url)
+            data[i] = text
+        except Exception as e:
+            print(f"[ERROR] Failed on {url}: {e}")
+    return data
+
+
+def get_news_data(url):
+    """Extract title, link, and date from an article."""
+    res = requests.get(url, headers=headers, verify=False)
+    soup = BeautifulSoup(res.content, 'html.parser')
+
+    # Extract title (first h1 tag with class 'kingster-single-article-title')
+    title = soup.find('h1', class_='kingster-single-article-title')
+    if title:
+        title_text = title.text.strip()
     else:
-        text_content = "No content found"
+        title_text = "Title not found"
 
-    # Return as JSON
-    article_data = {
-        "link": url,
-        "title": title_text,
-        "date": date,
-        "text": text_content
-    }
-    
-    return json.dumps(article_data, ensure_ascii=False, indent=4)
+    # Extract date (find the div with the class 'kingster-blog-info-date' and get the text inside <a>)
+    date_div = soup.find('div', class_='kingster-blog-info kingster-blog-info-font kingster-blog-info-date post-date updated')
+    if date_div:
+        date = date_div.find('a').text.strip()
+    else:
+        date = "Date not found"
 
+    print(f"Title: {title_text}")
+    print(f"Date: {date}")
+    print("--------------------------\n")
 
+    # return {
+    #     'title': title,
+    #     'link': url,
+    #     'date': date
+    # }
 def get_events_data(url):
     """Extract title, link, and date from an article."""
     res = requests.get(url, headers=headers, verify=False)
@@ -103,26 +111,16 @@ def get_events_data(url):
     else:
         time = "Date not found"
 
-    # print(f"Title: {title_text}")
-    # print(f"Date: {date}")
-    # print(f"Time: {time}")
-    # print("--------------------------\n")
+    print(f"Title: {title_text}")
+    print(f"Date: {date}")
+    print(f"Time: {time}")
+    print("--------------------------\n")
 
-    return {
-        'title': title,
-        'link': url,
-        'date': date,
-        'time':time,
-    }
-
-
-
-
-# news_links = get_article_links_news(news_url)
-# events_links = get_article_links_events(events_url)
-
-# news_dict = build_articles_dict(news_links)
-# events_dict = build_articles_dict(events_links)
+    # return {
+    #     'title': title,
+    #     'link': url,
+    #     'date': date
+    # }
 
 
 
@@ -140,4 +138,8 @@ urls = [
     'https://giki.edu.pk/event/giki-industrial-open-house-2025/'
 ]
 
-
+# for url in urls:
+#     data = get_article_data(url)
+    # print(data,'\n')
+    
+get_events_data('https://giki.edu.pk/event/giki-industrial-open-house-2025/')
