@@ -40,6 +40,7 @@ const TwitterCallback = () => {
           // console.log("Profile (Twitter Callback):", profile);
 
           setResponse(res); // Store response in state
+          localStorage.setItem("twitter_authenticated", "true");
 
           // Redirect to Twitter Profile Page
           window.location.href = "/social-platform/twitter";

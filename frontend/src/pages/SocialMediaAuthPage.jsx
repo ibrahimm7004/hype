@@ -69,6 +69,10 @@ const SocialMediaAuthPage = () => {
         return (window.location.href = "/user/login");
       }
 
+      if (platform.id == "meta/instagram") {
+        window.location = "/social-platform/manage/instagram";
+      }
+
       const response = await fetchData(
         `/${platform.id}/login`,
         "POST",
@@ -86,7 +90,7 @@ const SocialMediaAuthPage = () => {
   };
 
   return (
-    <div className="mt-12 flex flex-col items-center justify-center bg-gray-100 py-20 p-6">
+    <div className=" flex flex-col items-center justify-center bg-gradient-to-br from-pink-100 via-blue-100 to-white py-20 p-6 rounded-md">
       <div
         ref={cardRef}
         className="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full text-center"
