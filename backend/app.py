@@ -16,6 +16,7 @@ from Ai.meme_gen_routes import meme_gen_bp  # Import the blueprint
 from flask_session import Session
 from schedule_ultils import post_scheduled_posts
 from apscheduler.schedulers.background import BackgroundScheduler
+from giki.giki_routes import giki_bp
 
 import os 
 
@@ -60,7 +61,7 @@ mail.init_app(app)
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(twitter_bp, url_prefix="/api/twitter")  # Twitter OAuth routes
 app.register_blueprint(reddit_bp, url_prefix="/api/reddit")  # reddit routes
-# app.register_blueprint(meta_bp, url_prefix="/api/meta")  # meta routes
+app.register_blueprint(giki_bp, url_prefix="/api/giki")  # meta routes
 app.register_blueprint(instagram_bp, url_prefix="/api/meta/instagram")  # meta routes
 app.register_blueprint(facebook_bp, url_prefix="/api/meta/facebook")  # meta routes
 app.register_blueprint(cloudinary_bp, url_prefix="/api/cloudinary")  # Cloudinary routes

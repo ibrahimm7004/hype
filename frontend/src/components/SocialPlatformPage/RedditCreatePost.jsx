@@ -195,7 +195,7 @@ const RedditCreatePost = ({ initialImage = "" }) => {
 
             {/* Formatting Icons */}
             <div className="flex items-center space-x-4 text-gray-600 mt-3">
-              <motion.div
+              {/* <motion.div
                 className="cursor-pointer hover:text-orange-500"
                 whileHover={{ scale: 1.2 }}
               >
@@ -206,7 +206,7 @@ const RedditCreatePost = ({ initialImage = "" }) => {
                 whileHover={{ scale: 1.2 }}
               >
                 <FontAwesomeIcon icon={faItalic} />
-              </motion.div>
+              </motion.div> */}
               <motion.label
                 className="cursor-pointer hover:text-orange-500"
                 whileHover={{ scale: 1.2 }}
@@ -237,7 +237,7 @@ const RedditCreatePost = ({ initialImage = "" }) => {
                 </motion.button>
               </motion.div>
             )}
-            <img src={image} alt="image-preview" />
+            {image && <img src={image} alt="image-preview" />}
 
             {/* Schedule Post Option */}
             <div className="mt-4">

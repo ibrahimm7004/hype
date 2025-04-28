@@ -14,7 +14,6 @@ const LandingPage = () => {
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
   const imgRef = useRef(null);
-
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -26,62 +25,46 @@ const LandingPage = () => {
         "-=0.5"
       );
 
-      // Parallax effect for the image
+      // Parallax effect for the image during Features section
       gsap.to(imgRef.current, {
-        x: "50vw", // Move the image left and right
-        scale: 0.8, // Reduce the width of the image
+        x: "-40vw",
+        scale: 0.5,
         scrollTrigger: {
-          trigger: "#features", // Start from the Features section
-          start: "top bottom", // Trigger when the section is about to enter the viewport
-          end: "bottom top", // Trigger end when the section is leaving the viewport
-          scrub: 1, // Smooth scroll-based animation
-          markers: false, // Optional: Add markers to visualize the scroll trigger
-        },
-      });
-
-      // Image animation triggered after the Hero Section
-      gsap.to(imgRef.current, {
-        scale: 0.6, // Reduce the image size after the Hero section
-        scrollTrigger: {
-          trigger: "#middle", // Start from the FAQ section
-          start: "top center", // Trigger when the section enters the center of the viewport
-          end: "bottom top", // End animation as it scrolls out
-          scrub: 1, // Smooth animation
-          markers: false, // Optional: Add markers for debugging
-        },
-      });
-
-      // Parallax effect for img movement left to right for each section
-      gsap.to(imgRef.current, {
-        x: "30vw", // Adjust movement based on section scroll
-        scrollTrigger: {
-          trigger: "#middle", // Trigger the effect at the FAQ section
-          start: "top bottom", // Trigger when FAQ section enters the viewport
-          end: "bottom top", // End when FAQ section leaves
+          trigger: "#features",
+          start: "top bottom",
+          end: "bottom top", // STOP when features section ends
           scrub: 1,
+          markers: false,
         },
       });
 
-      gsap.to(imgRef.current, {
-        x: "-30vw", // Move in the opposite direction at the end of the page
-        scrollTrigger: {
-          trigger: "#end", // Trigger when the last section is in view
-          start: "top bottom", // Trigger when the section is about to enter the viewport
-          end: "bottom top", // End when it leaves the viewport
-          scrub: 1, // Smooth scroll animation
-        },
+      // Pin the image when Features section ends
+      ScrollTrigger.create({
+        trigger: "#features",
+        start: "bottom bottom", // when bottom of #features hits bottom of viewport
+        end: "bottom top", // until features section scrolls out
+        pin: imgRef.current,
+        pinSpacing: false,
+        scrub: true,
       });
     });
 
-    // Always refresh ScrollTrigger after DOM changes
     ScrollTrigger.refresh();
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <div className="relative overflow-x-hidden overflow-y-hidden">
-      {/* Floating LandingPage Image */}
+    <div className="relative min-h-screen overflow-x-hidden overflow-y-hidden">
+      {/* Floating LandingPage Image Container */}
+      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full pointer-events-none z-40">
+        <img
+          ref={imgRef}
+          src="/hero-img.png"
+          alt="LandingPage"
+          className="w-3/5 max-w-3xl mx-auto"
+        />
+      </div>
 
       {/* Hero Section */}
       <Hero titleRef={titleRef} subtitleRef={subtitleRef} imgRef={imgRef} />

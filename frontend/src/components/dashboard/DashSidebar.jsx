@@ -57,6 +57,11 @@ const menuItems = [
     name: "GIKI",
     path: null,
   },
+  {
+    name: "Campaign",
+    icon: <FaHome />,
+    path: "/giki",
+  },
 ];
 
 const DashSidebar = () => {
@@ -72,7 +77,7 @@ const DashSidebar = () => {
       initial={hasLoaded ? { opacity: 0 } : { x: 0 }} // Slide only on first load
       animate={{ x: 0, opacity: 1 }} // Fade effect on navigation
       transition={{ duration: 0.5 }}
-      className="h-screen w-64 bg-gradient-to-b from-purple-100 via-blue-100 to-white text-gray-800 flex flex-col p-5 shadow-lg"
+      className="h-screen w-64 bg-gradient-to-b from-purple-100 via-blue-100 to-white text-gray-800 flex flex-col p-5 shadow-lg rounded-md"
     >
       <h2
         className="text-2xl font-bold text-center mb-6 cursor-pointer "

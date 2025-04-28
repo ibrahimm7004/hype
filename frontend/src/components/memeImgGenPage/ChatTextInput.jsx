@@ -56,7 +56,7 @@ const ChatTextInput = ({ setInterfaceState, setPromptText }) => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+    <div className=" flex flex-col items-center justify-center px-4">
       <div className="text-center text-gray-700 mb-8">
         <h1 className="font-bold text-4xl mb-3 tracking-tight">
           Generate Post
