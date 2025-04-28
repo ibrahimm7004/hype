@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import fetchData from "../../../utils/fetchData";
 import DateTimePicker from "../../utils/DateTimePicker";
@@ -15,7 +15,23 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
   const [scheduledTime, setScheduledTime] = useState(new Date());
 
   const MAX_CHAR_COUNT = 5000;
+  const fetchImageFromUrl = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "tweet-image.jpg", { type: blob.type });
+      setImage(URL.createObjectURL(blob));
+      setImageFile(file);
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    }
+  };
 
+  useEffect(() => {
+    if (initialImage && initialImage.startsWith("http")) {
+      fetchImageFromUrl(initialImage);
+    }
+  }, [initialImage]);
   const handleTextChange = (e) => {
     const text = e.target.value;
     setPostText(text);
@@ -86,7 +102,7 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-100 mt-10 text-gray-700">
+    <div className="flex items-center justify-center  mt-10 text-gray-700">
       <motion.div
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}

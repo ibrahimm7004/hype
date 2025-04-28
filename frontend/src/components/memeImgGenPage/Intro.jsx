@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
-const MemeGenPage = () => {
+const Intro = ({ setInterfaceState }) => {
   const gridRef = useRef(null);
   const textRef = useRef(null);
   const buttonRef = useRef(null);
@@ -74,8 +74,7 @@ const MemeGenPage = () => {
           <button
             ref={buttonRef}
             onClick={() => {
-              window.location =
-                "/social-platform/twitter/ai-marketing/memeImage";
+              setInterfaceState("textPrompt");
             }}
             className="bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold px-6 py-3 rounded-full shadow-md transition duration-300"
           >
@@ -87,4 +86,4 @@ const MemeGenPage = () => {
   );
 };
 
-export default MemeGenPage;
+export default Intro;

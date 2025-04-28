@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { gsap } from "gsap";
+import { motion } from "framer-motion"; // use motion for animation like in FacebookCreatePost
 import fetchData from "../../../utils/fetchData";
 import DateTimePicker from "../../utils/DateTimePicker";
 
-const InstagramCreatePost = () => {
+const InstagramCreatePost = ({ initialImage = "" }) => {
   const [caption, setCaption] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imageFile, setImageFile] = useState(null);
-  const [preview, setPreview] = useState("");
+
+  const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(null);
 
@@ -17,19 +18,28 @@ const InstagramCreatePost = () => {
   const formRef = useRef(null);
 
   useEffect(() => {
-    gsap.from(formRef.current, {
-      opacity: 0,
-      y: 20,
-      duration: 0.5,
-      ease: "power2.out",
-    });
-  }, []);
+    if (initialImage && initialImage.startsWith("http")) {
+      fetchImageFromUrl(initialImage);
+    }
+  }, [initialImage]);
+
+  const fetchImageFromUrl = async (url) => {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const file = new File([blob], "instagram-image.jpg", { type: blob.type });
+      setImage(URL.createObjectURL(blob));
+      setImageFile(file);
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    }
+  };
 
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      setPreview(URL.createObjectURL(file));
+      setImage(URL.createObjectURL(file));
       setImageUrl("");
     }
   };
@@ -37,14 +47,12 @@ const InstagramCreatePost = () => {
   const handleImageUrlChange = (e) => {
     setImageUrl(e.target.value);
     setImageFile(null);
-    setPreview(e.target.value);
+    setImage(e.target.value);
   };
 
   const handlePost = async () => {
     if (!imageUrl && !imageFile) {
-      setResponse({
-        error: "Please provide either an image URL or upload a file.",
-      });
+      setResponse({ error: "Please provide an image URL or upload a file." });
       return;
     }
 
@@ -71,18 +79,19 @@ const InstagramCreatePost = () => {
       }
 
       const res = await fetchData("/meta/instagram/post", "POST", formData);
+
       if (res.error) {
         setResponse({ error: res.error });
       } else {
         setResponse({
           success: schedulePost
             ? "Post scheduled successfully!"
-            : "Post published successfully!",
+            : "Post shared successfully!",
         });
         setCaption("");
         setImageUrl("");
         setImageFile(null);
-        setPreview("");
+        setImage("");
         setScheduledDate(null);
         setSchedulePost(false);
       }
@@ -94,103 +103,152 @@ const InstagramCreatePost = () => {
   };
 
   return (
-    <div ref={formRef} className="space-y-6 text-gray-700">
-      <h2 className="text-xl font-bold text-pink-600">📸 Share on Instagram</h2>
-
-      {/* Image URL */}
-      <div>
-        <label className="block font-semibold mb-1">Image URL</label>
-        <input
-          type="url"
-          value={imageUrl}
-          onChange={handleImageUrlChange}
-          placeholder="https://example.com/image.jpg"
-          className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500"
-          disabled={!!imageFile}
-        />
-      </div>
-
-      {/* File Upload */}
-      <div>
-        <label className="block font-semibold mb-1">Or Upload Image</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageFileChange}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
-          disabled={!!imageUrl}
-        />
-      </div>
-
-      {/* Preview */}
-      {preview && (
-        <div className="mt-2">
-          <img src={preview} alt="Preview" className="rounded-md max-w-full" />
-        </div>
-      )}
-
-      {/* Caption */}
-      <div>
-        <label className="block font-semibold mb-1">Caption</label>
-        <textarea
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          rows="4"
-          placeholder="Write your caption..."
-          className="w-full px-4 py-2 border rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-pink-500"
-        />
-      </div>
-
-      {/* Schedule Checkbox */}
-      <div className="flex items-center space-x-2">
-        <input
-          type="checkbox"
-          checked={schedulePost}
-          onChange={() => setSchedulePost(!schedulePost)}
-          className="accent-pink-600"
-        />
-        <label className="text-sm font-medium">📅 Schedule this post</label>
-      </div>
-
-      {/* Conditional DateTime Picker */}
-      {schedulePost && (
-        <DateTimePicker
-          selectedDate={scheduledDate}
-          onChange={setScheduledDate}
-        />
-      )}
-
-      {/* Post Button */}
-      <button
-        onClick={handlePost}
-        disabled={loading}
-        className={`w-full py-2 rounded-xl text-white font-semibold transition duration-300 ${
-          loading
-            ? "bg-pink-400 cursor-not-allowed"
-            : "bg-pink-600 hover:bg-pink-700"
-        }`}
+    <div className="flex items-center justify-center mt-10 text-gray-700">
+      <motion.div
+        ref={formRef}
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white shadow-lg rounded-lg p-16 pb-20 flex"
       >
-        {loading
-          ? schedulePost
-            ? "Scheduling..."
-            : "Posting..."
-          : schedulePost
-          ? "Schedule Post"
-          : "Post to Instagram"}
-      </button>
-
-      {/* Response */}
-      {response && (
-        <div
-          className={`mt-4 p-3 rounded-xl text-sm font-medium ${
-            response.error
-              ? "bg-red-100 text-red-700"
-              : "bg-green-100 text-green-700"
-          }`}
-        >
-          {response.error || response.success}
+        {/* Left Panel */}
+        <div className="w-1/3 p-4 flex flex-col items-center border-r text-center">
+          <motion.h2
+            className="text-2xl font-bold text-pink-600 mb-2"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            Share on Instagram 📸
+          </motion.h2>
+          <p className="text-gray-600 text-sm">
+            Share moments, promotions, or updates with your Instagram followers.
+          </p>
+          <motion.img
+            src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"
+            alt="Instagram"
+            className="w-20 h-20 mt-4"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.3 }}
+          />
         </div>
-      )}
+
+        {/* Right Form */}
+        <div className="w-2/3 p-6">
+          <div className="space-y-4">
+            {/* Caption */}
+            <motion.textarea
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              placeholder="Write a caption..."
+              className="w-full h-28 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+            />
+
+            {/* Image Preview */}
+            {image && (
+              <motion.div
+                className="mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <img
+                  src={image}
+                  alt="Preview"
+                  className="max-w-full rounded-md"
+                />
+              </motion.div>
+            )}
+
+            {/* Upload or URL */}
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <label
+                  htmlFor="insta-image-upload"
+                  className="cursor-pointer text-pink-600 hover:underline"
+                >
+                  📷 Upload Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="insta-image-upload"
+                  onChange={handleImageFileChange}
+                  className="hidden"
+                  disabled={!!imageUrl}
+                />
+              </div>
+
+              <input
+                type="text"
+                placeholder="...or paste image URL"
+                value={imageUrl}
+                onChange={handleImageUrlChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                disabled={!!imageFile}
+              />
+            </div>
+
+            {/* Schedule Post */}
+            <div className="mt-4 flex items-center gap-3">
+              <label className="text-sm font-medium">
+                ⏰ Schedule this post?
+              </label>
+              <input
+                type="checkbox"
+                checked={schedulePost}
+                onChange={() => setSchedulePost(!schedulePost)}
+                className="form-checkbox h-5 w-5 text-pink-600"
+              />
+            </div>
+
+            {/* DateTime Picker */}
+            {schedulePost && (
+              <DateTimePicker
+                selectedDate={scheduledDate}
+                onChange={setScheduledDate}
+              />
+            )}
+
+            {/* Post Button */}
+            <div className="mt-6 flex justify-end">
+              <motion.button
+                onClick={handlePost}
+                disabled={loading}
+                className={`px-6 py-2 rounded-full font-semibold text-white transition-all ${
+                  loading
+                    ? "bg-pink-400 cursor-not-allowed"
+                    : "bg-pink-600 hover:bg-pink-700"
+                }`}
+                whileTap={{ scale: 0.95 }}
+              >
+                {loading
+                  ? schedulePost
+                    ? "Scheduling..."
+                    : "Posting..."
+                  : schedulePost
+                  ? "Schedule Post"
+                  : "Post to Instagram"}
+              </motion.button>
+            </div>
+
+            {/* Response */}
+            {response && (
+              <div
+                className={`mt-4 p-3 rounded-xl text-sm font-medium ${
+                  response.error
+                    ? "bg-red-100 text-red-700"
+                    : "bg-green-100 text-green-700"
+                }`}
+              >
+                {response.error || response.success}
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

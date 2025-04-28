@@ -5,9 +5,10 @@ import PromptQna from "../components/memeImgGenPage/PromptQna";
 import fetchData from "../utils/fetchData";
 import ImageGallery from "../components/aiMarketing/ImageGallery";
 import CustomLoader from "../utils/CustomLoader";
+import Intro from "../components/memeImgGenPage/Intro";
 
 const MemeImgGenPage = () => {
-  const [interfaceState, setInterfaceState] = useState("textPrompt");
+  const [interfaceState, setInterfaceState] = useState("Intro");
   const [promptText, setPromptText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [promptQna, setPromptQna] = useState("");
@@ -40,23 +41,26 @@ const MemeImgGenPage = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      await generatePostHandler();
+    };
+
+    fetchData();
+  }, []);
+
   return isLoading ? (
     <CustomLoader />
   ) : (
     <div className="flex flex-col items-center justify-center bg-gray-100 py-8 px-4  sm:px-6 md:px-8">
       {/* Main container */}
       {interfaceState !== "gallery" && (
-        <div className="bg-white rounded-lg shadow-lg w-5/6 p-8">
-          <div className="text-center text-gray-700 mb-8">
-            <h1 className="font-bold text-4xl mb-2">Generate Post</h1>
-            <p className="w-1/2 text-md font-light text-center mx-auto">
-              Enter your prompt below, and we’ll generate a perfect marketing
-              post with an engaging title, body, and hashtags to improve its
-              reach!
-            </p>
-          </div>
-
+        <div className="bg-white rounded-lg shadow-lg w-full p-8">
           {/* Conditional rendering for different states */}
+
+          {interfaceState === "Intro" && (
+            <Intro setInterfaceState={setInterfaceState} />
+          )}
           {interfaceState === "textPrompt" && (
             <ChatTextInput
               setPromptText={setPromptText}
