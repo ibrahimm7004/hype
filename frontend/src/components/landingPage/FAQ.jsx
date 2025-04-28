@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+// Register ScrollTrigger with GSAP
 gsap.registerPlugin(ScrollTrigger);
 
 const faqData = [
@@ -31,10 +32,11 @@ function FAQ() {
   const [openIndex, setOpenIndex] = useState(null);
   const faqRef = useRef();
 
+  // Animate when the FAQ section comes into view
   useEffect(() => {
     gsap.fromTo(
       faqRef.current,
-      { opacity: 0, y: 60 },
+      { opacity: 0, y: 50 },
       {
         opacity: 1,
         y: 0,
@@ -42,97 +44,90 @@ function FAQ() {
         ease: "power3.out",
         scrollTrigger: {
           trigger: faqRef.current,
-          start: "top 80%",
+          start: "top 80%", // Animation starts when the section is 80% into view
+          end: "bottom 20%",
+          scrub: true, // Optional: smooth scroll-based animation
+        },
+      }
+    );
+
+    gsap.fromTo(
+      ".faq-item",
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.2,
+        stagger: 0.1,
+        delay: 0.5,
+        scrollTrigger: {
+          trigger: ".faq-item",
+          start: "top 90%", // Animation triggers when FAQ item comes into view
+          end: "bottom 10%",
+          toggleActions: "play none none reverse", // Toggle animation when scrolling in/out of view
         },
       }
     );
   }, []);
 
+  // Handle the expansion/collapse animation of the FAQ items
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  // GSAP animation for expanding and collapsing the FAQ answer
   useEffect(() => {
-    faqData.forEach((_, index) => {
-      const item = document.getElementById(`faq-answer-${index}`);
-      if (item) {
-        if (openIndex === index) {
-          gsap.to(item, {
-            height: "auto",
-            opacity: 1,
-            paddingTop: 16,
-            paddingBottom: 16,
-            duration: 0.6,
-            ease: "power3.out",
-          });
-        } else {
-          gsap.to(item, {
-            height: 0,
-            opacity: 0,
-            paddingTop: 0,
-            paddingBottom: 0,
-            duration: 0.5,
-            ease: "power3.inOut",
-          });
-        }
-      }
-    });
+    if (openIndex !== null) {
+      const item = document.getElementById(`faq-item-${openIndex}`);
+      gsap.to(item.querySelector(".faq-answer"), {
+        duration: 0.5,
+        maxHeight: "200px", // Or any max height you prefer for the expanded section
+        opacity: 1,
+        ease: "power2.out",
+      });
+    } else {
+      faqData.forEach((_, index) => {
+        const item = document.getElementById(`faq-item-${index}`);
+        gsap.to(item.querySelector(".faq-answer"), {
+          duration: 0.5,
+          maxHeight: "0px",
+          opacity: 0,
+          ease: "power2.in",
+        });
+      });
+    }
   }, [openIndex]);
 
   return (
     <section
       ref={faqRef}
       id="faq"
-      className="py-24 max-w-4xl mx-auto px-6 text-center"
+      className="py-24 max-w-5xl mx-auto text-center"
     >
-      <h2 className="text-5xl font-extrabold mb-16 leading-tight">
-        Frequently Asked{" "}
-        <span className="bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500 bg-clip-text text-transparent">
-          Questions
-        </span>
+      <h2 className="text-5xl font-bold mb-12">
+        Frequently Asked <span className="gradient-text">Questions</span>
       </h2>
-
-      <div className="space-y-8">
+      <div className="space-y-6">
         {faqData.map((faq, index) => (
           <div
+            id={`faq-item-${index}`}
             key={index}
+            className="faq-item border border-gray-300 dark:border-gray-700 rounded-lg p-6 text-left cursor-pointer transition-all"
             onClick={() => toggleFAQ(index)}
-            className="faq-item backdrop-blur-md bg-white/10 dark:bg-gray-800/20 border border-white/30 dark:border-gray-700 rounded-2xl p-6 text-left cursor-pointer transition-all duration-300 hover:shadow-2xl hover:border-pink-400 relative overflow-hidden"
           >
             <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                {faq.question}
-              </h3>
-              <span
-                className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${
-                  openIndex === index
-                    ? "bg-gradient-to-tr from-pink-500 to-purple-500 text-white rotate-45"
-                    : "bg-white/30 dark:bg-gray-700/50 text-gray-600"
-                }`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-              </span>
+              <h3 className="text-2xl font-semibold">{faq.question}</h3>
+              <span className="text-xl">{openIndex === index ? "−" : "+"}</span>
             </div>
-            <div
-              id={`faq-answer-${index}`}
-              className="overflow-hidden text-gray-700 dark:text-gray-300 mt-4 text-lg leading-relaxed"
-              style={{ height: 0, opacity: 0 }}
+            <p
+              className={`faq-answer text-gray-800  mt-3 overflow-hidden transition-all`}
+              style={{
+                maxHeight: openIndex === index ? "200px" : "0px",
+                opacity: openIndex === index ? 1 : 0,
+              }}
             >
-              <p>{faq.answer}</p>
-            </div>
+              {faq.answer}
+            </p>
           </div>
         ))}
       </div>

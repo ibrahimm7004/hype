@@ -20,6 +20,12 @@ const Hero = ({ titleRef = null, subtitleRef = null, imgRef = null }) => {
           </span>
           apps at one place with <span className="font-semibold">AI</span>.
         </p>
+        <img
+          ref={imgRef}
+          src="/hero-img.png"
+          alt="LandingPage"
+          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-3/5 max-w-3xl z-40 pointer-events-none"
+        />
       </div>
     </section>
   );
