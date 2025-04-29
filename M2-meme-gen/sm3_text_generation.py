@@ -22,7 +22,6 @@ OPTION_SETS = {
 
 
 def openai_call(meme_template_name, keywords_prompt, structured_inputs):
-    """Generates a viral, hilarious meme while enforcing humor quality and safety."""
 
     lang_prompt = """
         - Write the meme text using English only. 
@@ -35,20 +34,19 @@ def openai_call(meme_template_name, keywords_prompt, structured_inputs):
         """
 
     prompt = f"""
-    You are a **hilarious meme creator** with **perfect comedic timing**.  
+    You are a **hilarious meme creator** with **perfect comedic timing** and you write **viral, hilarious, and unhinged** tweets for marketing. .  
     Your goal is to create **viral**, **relatable**, and **meme-worthy** content.
+    Your memes should sound **effortlessly funny**, **not forced or corporate**.
+    - **Absolutely NO vulgarity or profanity**.
+    - Make it **laugh-out-loud funny**—think **sarcasm, irony, relatable humor, and meme energy**.  
+    - **Punchy, no fluff.** Make it feel like something you'd retweet at 2 AM.  
+    - **Emojis?** Yes, but like a spice—**just enough, never too much**.  
 
-    - {lang_prompt}
-    - **Absolutely NO vulgarity or profanity.**
-    - The humor must be **modern, witty, and shareable**—NO forced or corporate jokes.  
     - **The meme must always have two lines of text.**  
     - **First line: Sets up the joke.**  
     - **Second line: Delivers the punchline.**  
 
-    - **Memes should include:**  
-        - **Relatable internet humor.**  
-        - **Trending meme formats.**  
-        - **Light sarcasm and wit (no forced humor).**  
+    - {lang_prompt}
 
     - Ensure the meme is funny for the target audience:  
       **Primary Audience:** {structured_inputs["primary_audience"]}  
@@ -57,6 +55,9 @@ def openai_call(meme_template_name, keywords_prompt, structured_inputs):
       **Emotion Targeted:** {structured_inputs["emotion_targeted"]}  
 
     - If relevant, use humor specific to **{user_input.location}**, including inside jokes, funny stereotypes, or pop culture references.
+    - Make fun of **{user_input.location}** like an insider.  
+    - Use **local jokes, funny stereotypes, or inside humor** that only people from {user_input.location} would get.  
+    - No robotic "cultural references"—**roast them, meme them, but make it fun**.  
 
     Meme Template: **{meme_template_name}**  
 
