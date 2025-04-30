@@ -9,3 +9,5 @@ engagement_type = ["Comment Bait"]
 seasonality = ["Evergreen"]
 tone_alignment = ["Playful", "Trendy"]
 keywords_prompt = "We run a productivity app that helps users stay organized and get things done. It’s great for students, remote workers, and busy professionals. We want memes that highlight how frustrating staying productive can be and how our app makes it easier."
+location = "Lahore, Pakistan"
+language = "Urdu"
