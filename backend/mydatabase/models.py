@@ -8,12 +8,13 @@ def generate_secure_user_id():
     return str(uuid.uuid4())[:16]  # Shortened UUID
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(16), unique=True, nullable=False, default=generate_secure_user_id, index=True)
+    user_id = db.Column(db.String(16), primary_key=True, unique=True, nullable=False, default=generate_secure_user_id, index=True)  # Make user_id the primary key
+    id = db.Column(db.Integer)  # Remove primary_key from this line
     username = db.Column(db.String(100), unique=True, nullable=False, index=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password = db.Column(db.String(255), nullable=False)  # Already hashed elsewhere
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class ScheduledTweet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
