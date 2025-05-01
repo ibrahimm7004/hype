@@ -34,7 +34,6 @@ const InstagramCreatePost = ({ initialImage = "" }) => {
       console.error("Error fetching image:", error);
     }
   };
-
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
