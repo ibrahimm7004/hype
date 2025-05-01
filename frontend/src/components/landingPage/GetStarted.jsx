@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -58,6 +56,7 @@ const GetStarted = () => {
       </p>
       <button
         ref={buttonRef}
+        onClick={() => (window.location = "/user/register")}
         className="px-8 py-4 bg-purple-500 hover:bg-purple-600 text-white rounded-2xl text-lg font-semibold transition-all shadow-lg"
       >
         Get Started
