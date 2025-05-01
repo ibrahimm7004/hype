@@ -24,12 +24,28 @@ const UserRegister = () => {
     setMessage("");
     setError("");
 
+    const { username, email, password } = formData;
+
+    // Basic Email and Password Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetchData("/auth/register", "POST", formData);
       console.log("Response (register):", response);
       const data = await response.data;
 
-      if (response.status == 200 || response.status == 201) {
+      if (response.status === 200 || response.status === 201) {
         setMessage("User registered successfully! 🎉");
         setFormData({ username: "", email: "", password: "" });
       } else {
@@ -38,7 +54,7 @@ const UserRegister = () => {
     } catch (err) {
       console.error("Error registering user:", err);
       setError(
-        err.response.data.error || "Registration failed. Please try again."
+        err.response?.data?.error || "Registration failed. Please try again."
       );
     }
 

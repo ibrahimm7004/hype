@@ -8,8 +8,8 @@ def generate_secure_user_id():
     return str(uuid.uuid4())[:16]  # Shortened UUID
 
 class User(db.Model):
-    user_id = db.Column(db.String(16), primary_key=True, unique=True, nullable=False, default=generate_secure_user_id, index=True)  # Make user_id the primary key
-    id = db.Column(db.Integer)  # Remove primary_key from this line
+    id = db.Column(db.Integer, primary_key=True)  # Remove primary_key from this line
+    user_id = db.Column(db.String(16),  unique=True, nullable=False, default=generate_secure_user_id, index=True)  # Make user_id the primary key
     username = db.Column(db.String(100), unique=True, nullable=False, index=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password = db.Column(db.String(255), nullable=False)  # Already hashed elsewhere

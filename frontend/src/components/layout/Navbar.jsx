@@ -60,7 +60,7 @@ const Navbar = () => {
         </NavLink>
         {userLoggedIn ? (
           <NavLink
-            to="/social-platform/twitter"
+            to="/dashboard"
             className={({ isActive }) =>
               isActive
                 ? "text-gray-800 font-bold tracking-wide"

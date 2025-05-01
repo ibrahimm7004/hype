@@ -20,8 +20,17 @@ giki_bp = Blueprint("giki", __name__)
 import requests
 from bs4 import BeautifulSoup
 import urllib3
-from datetime import datetime
+
 import json
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
+
+
+
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_KEY"))
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -204,3 +213,82 @@ def fetch_giki_events():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+
+
+
+@giki_bp.route('/create-giki-news-post', methods=['POST'])
+def create_giki_news_post():
+    data = request.get_json()
+    print(data)
+    news = data.get("news")
+
+    if not news:
+        return jsonify({"error": "No news item provided"}), 400
+
+    try:
+        # Call openai_call with the full news dictionary
+        response = openai_call(news)
+        print(response)
+        
+        return jsonify({"post": response})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def openai_call(news_item):
+    """
+    Calls OpenAI to generate a social media post for a GIKI university news item.
+    Expects a dict with 'title', 'date', and 'text'. Returns structured JSON.
+    """
+    print(news_item)
+
+    title = news_item.get("title", "")
+    date = news_item.get("date", "")
+    summary = news_item.get("text", "")
+
+    system_prompt = (
+        "You are a witty and creative AI assistant that crafts viral social media content "
+        "for a university audience. Your job is to generate short, punchy posts based on campus news."
+    )
+
+    task_description = """
+    Return a response in **this exact JSON format**:
+
+    {
+    "caption": "Catchy caption for the post",
+    "title": "Scroll-stopping headline",
+    "hashtags": ["#hashtag1", "#hashtag2"],
+    "image_text": "Bold phrase for image overlay"
+    }
+
+    Instructions:
+    - Keep tone fun, energetic, and youth-friendly.
+    - Don't include any extra explanation or text outside the JSON.
+    - Ensure hashtags are relevant (GIKI-specific + trending).
+    """
+
+    user_prompt = f"""
+    News Title: {title}
+    News Date: {date}
+    News Summary: {summary}
+    """
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"{task_description}\n\n{user_prompt}"}
+            ],
+            response_format={"type": "json_object"}
+        )
+        content = response.choices[0].message.content.strip()
+        return json.loads(content)
+
+    except json.JSONDecodeError:
+        return {"error": "OpenAI returned invalid JSON."}
+    except Exception as e:
+        return {"error": str(e)}

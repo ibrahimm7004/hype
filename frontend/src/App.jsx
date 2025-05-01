@@ -34,6 +34,9 @@ import UserFacebookPageList from "./components/meta/facebook/UserFacebookPageLis
 import SaveInstagramId from "./components/meta/instagram/SaveInstagramId";
 import FacebookCallback from "./components/SocialPlatformPage/FacebookCallback";
 import GikiCampaignPage from "./pages/GikiCampaignPage";
+import TrendsPage from "./pages/TrendsPage";
+import SentimentAnalyzer from "./components/trends/SentimentAnalyzer";
+import RedditTrends from "./components/trends/RedditTrends";
 
 const App = () => (
   <BrowserRouter>
@@ -44,6 +47,12 @@ const App = () => (
 
       <Route path="giki" element={<DashboardLayout />}>
         <Route path="" element={<GikiCampaignPage />} />
+      </Route>
+
+      <Route path="trends" element={<DashboardLayout />}>
+        <Route path="" element={<TrendsPage />} />
+        <Route path="sentiment-analyzer" element={<SentimentAnalyzer />} />
+        <Route path="keyword-searcher" element={<RedditTrends />} />
       </Route>
 
       {/* Authentication and Dashboard Routes */}

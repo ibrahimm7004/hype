@@ -11,6 +11,7 @@ from routes.cloudinary_routes import cloudinary_bp  # Import the blueprint
 from routes.reddit_routes import reddit_bp  # Import the blueprint
 from routes.facebook_routes import facebook_bp
 from routes.instagram_routes import instagram_bp
+from routes.trends_routes import trends_bp
 from datetime import timedelta
 from Ai.meme_gen_routes import meme_gen_bp  # Import the blueprint
 from flask_session import Session
@@ -66,6 +67,7 @@ app.register_blueprint(instagram_bp, url_prefix="/api/meta/instagram")  # meta r
 app.register_blueprint(facebook_bp, url_prefix="/api/meta/facebook")  # meta routes
 app.register_blueprint(cloudinary_bp, url_prefix="/api/cloudinary")  # Cloudinary routes
 app.register_blueprint(meme_gen_bp, url_prefix="/api/ai/meme-gen")  # meme_gen routes
+app.register_blueprint(trends_bp, url_prefix="/api/trends")  # trends routes
 
 # Create Tables
 with app.app_context():

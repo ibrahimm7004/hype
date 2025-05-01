@@ -4,7 +4,7 @@ import GikiEvents from "../components/giki/GikiEvents";
 import GikiNews from "../components/giki/GikiNews";
 
 const GikiCampaignPage = () => {
-  const [activeTab, setActiveTab] = useState("events");
+  const [activeTab, setActiveTab] = useState("news");
 
   // Handle the toggle between events and news
   const handleToggle = (tab) => {
@@ -28,16 +28,16 @@ const GikiCampaignPage = () => {
     <div className="flex flex-col items-center bg-gradient-to-br from-pink-100 via-blue-100 to-white rounded-lg p-4">
       <div className="flex space-x-6 mb-6">
         <button
-          onClick={() => handleToggle("events")}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg focus:outline-none transition-all duration-300 hover:bg-blue-600"
-        >
-          Events
-        </button>
-        <button
           onClick={() => handleToggle("news")}
           className="px-6 py-2 bg-green-500 text-white rounded-lg focus:outline-none transition-all duration-300 hover:bg-green-600"
         >
           News
+        </button>
+        <button
+          onClick={() => handleToggle("events")}
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg focus:outline-none transition-all duration-300 hover:bg-blue-600"
+        >
+          Events
         </button>
       </div>
 

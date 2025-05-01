@@ -22,6 +22,8 @@ services:
     restart: always
     depends_on:
       - db
+    env_file:
+      - .env  # 👈 This line loads env vars from your .env file
     environment:
       DATABASE_URL: postgresql://talhaimtiaz:root@db/fyp
     ports:

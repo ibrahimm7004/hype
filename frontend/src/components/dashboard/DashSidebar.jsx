@@ -54,6 +54,22 @@ const menuItems = [
     path: "/social-platform/twitter/ai-marketing/memeImage",
   },
   {
+    name: "Trends",
+    path: null,
+  },
+  {
+    name: "Keyword Searcher",
+    icon: <FaHome />,
+    path: "/trends/keyword-searcher",
+  },
+
+  {
+    name: "Sentiment Analyzer",
+    icon: <FaHome />,
+    path: "/trends/sentiment-analyzer",
+  },
+
+  {
     name: "GIKI",
     path: null,
   },
