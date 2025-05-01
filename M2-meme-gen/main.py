@@ -6,12 +6,11 @@ import sm4_meme_creation
 import pandas as pd
 
 # loading memes dataset for matching
-memes_df = pd.read_csv('memes_dataset.csv')
+memes_df = pd.read_csv(
+    r'C:\Users\hp\Desktop\fyp\mvp\M2-meme-gen\meme_features_new.csv')
 
 user_input_df = pd.DataFrame(columns=[
-    "Keywords", "Primary Audience", "Secondary Audience", "Industry",
-    "Product/Service", "Best Platforms", "Humor Style", "Emotion Targeted",
-    "Engagement Type", "Seasonality", "Tone Alignment"
+    "Keywords", "Primary Audience", "Humor Style"
 ])
 
 # extracting keywords from user prompt
@@ -21,15 +20,7 @@ keywords = sm1_keyword_extraction.extract_keywords(
 user_input_df.loc[0] = [
     keywords,
     user_input.primary_audience,
-    user_input.secondary_audience,
-    user_input.industry,
-    user_input.product_service,
-    user_input.best_platforms,
-    user_input.humor_style,
-    user_input.emotion_targeted,
-    user_input.engagement_type,
-    user_input.seasonality,
-    user_input.tone_alignment
+    user_input.humor_style
 ]
 
 matches_df = sm2_scoring.matching(user_input_df, memes_df)
@@ -40,4 +31,5 @@ meme_texts = sm3_text_generation.generate_meme_text(
 print(meme_texts)
 
 for key, value in meme_texts.items():
-    sm4_meme_creation.generate_meme(key, value[0], value[1])
+    top_text, bottom_text = value["text"]
+    sm4_meme_creation.generate_meme(key, top_text, bottom_text)

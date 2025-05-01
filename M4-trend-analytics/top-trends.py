@@ -7,7 +7,7 @@ load_dotenv()
 client = openai.OpenAI(api_key=os.getenv("OPENAI_KEY"))
 
 
-def get_trending_trends(social_media: str, location: str, trend_type: str, num: int = 10) -> list:
+def get_trends(social_media: str, location: str, trend_type: str, num: int = 10) -> list:
     prompt = (
         f"List the top {num} trending {trend_type} on {social_media} in {location} right now. "
         f"Return only a comma-separated list, no explanation."
@@ -28,12 +28,12 @@ def get_trending_trends(social_media: str, location: str, trend_type: str, num: 
     )
 
     raw_text = response.output_text.strip()
-    trends = [trend.strip()[40]
+    trends = [trend.strip()[:40]
               for trend in raw_text.split(',') if trend.strip()]
     return trends[:num]
 
 
-# example usage: print(get_trending_trends('instagram', 'Pakistan', 'news', 5))
+print(get_trending_trends('instagram', 'Pakistan', 'news', 5))
 
 # trend_type: hastags, topics, memes, challenges, keywords, accounts, news
 # social_media: reddit, twitter, facebook, instagram

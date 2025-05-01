@@ -1,14 +1,13 @@
 import pandas as pd
 
+# === MATCHING FUNCTION ===
+
 
 def matching(user_input_df, memes_dataset_loaded):
-    matches_df = pd.DataFrame(columns=memes_dataset_loaded.columns)
+    matches_df = pd.DataFrame()
     matches_df["Meme Name"] = memes_dataset_loaded["Meme Name"]
 
-    for col in user_input_df.columns:
-        if col == "Meme Name":
-            continue
-
+    for col in ["Primary Audience", "Humor Style", "Keywords"]:
         user_values = user_input_df[col].iloc[0]
 
         if isinstance(user_values, (list, set)):
@@ -59,19 +58,12 @@ def matching(user_input_df, memes_dataset_loaded):
     return matches_df
 
 
+# === SCORING FUNCTION (Updated Weights) ===
 def calculate_weighted_scores(matches_df):
     WEIGHTS = {
-        "Keywords": 0.1613,
-        "Humor Style": 0.1613,
-        "Emotion Targeted": 0.1613,
-        "Tone Alignment": 0.0968,
-        "Primary Audience": 0.0968,
-        "Seasonality": 0.0968,
-        "Best Platforms": 0.0968,
-        "Secondary Audience": 0.0323,
-        "Engagement Type": 0.0323,
-        "Industry": 0.0323,
-        "Product/Service": 0.0323
+        "Keywords": 0.5,
+        "Humor Style": 0.3,
+        "Primary Audience": 0.2
     }
 
     matches_df["Score"] = 0

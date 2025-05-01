@@ -5,11 +5,11 @@ import nltk
 from nltk.corpus import stopwords
 
 
-def get_reddit_trends(industry, limit=500):
+def get_reddit_trends(topic, limit=500):
     headers = {'User-Agent': 'trend-analyzer/0.1'}
     stop_words = set(stopwords.words('english'))
 
-    url = f"https://www.reddit.com/search.json?q={industry}&sort=top&t=week&limit={limit}"
+    url = f"https://www.reddit.com/search.json?q={topic}&sort=top&t=week&limit={limit}"
     response = requests.get(url, headers=headers)
 
     if response.status_code != 200:
@@ -30,6 +30,6 @@ def get_reddit_trends(industry, limit=500):
 
 
 # Example usage
-industry_input = input(
-    "Enter a topic: ").strip()
-get_reddit_trends(industry_input)
+# industry_input = input(
+#     "Enter a topic: ").strip()
+# get_reddit_trends(industry_input)

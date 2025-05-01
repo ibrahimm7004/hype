@@ -8,17 +8,13 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_KEY"))
 
 OPTION_SETS = {
-    "Primary Audience": ["Kids", "Teens", "Young Adults", "Millennials", "Adults", "Older Adults", "General Audience (All)"],
-    "Secondary Audience": ["Teens", "Young Adults", "Millennials", "Adults", "Older Adults", "General Audience (All)", "Professionals", "Tech Enthusiasts", "Gamers", "Pop Culture Fans"],
-    "Industry": ["eCommerce", "Fashion & Beauty", "Food & Beverage", "Tech & Software", "Finance", "Healthcare", "Education", "Entertainment", "Automotive", "Travel", "B2B", "General"],
-    "Product/Service": ["Physical Products", "Luxury Goods", "Subscription Services", "Food & Beverages", "Events & Experiences", "Tech Products", "Education & Courses", "B2B Services", "Brand Awareness"],
-    "Best Platforms": ["Instagram", "Facebook", "Twitter (X)", "General"],
-    "Humor Style": ["Relatable", "Sarcastic", "Wholesome", "Dark Humor", "Satirical", "Self-Deprecating", "Absurd", "Workplace", "Pop Culture", "Nostalgic", "Reaction-Based"],
-    "Emotion Targeted": ["FOMO", "Excitement", "Regret", "Confidence", "Shock", "Confusion", "Happiness", "Frustration", "Empowerment", "Curiosity"],
-    "Engagement Type": ["Tag a Friend", "Shareable", "Call to Action", "Comment Bait", "Self-Identification", "Educational", "Controversial", "Nostalgic", "Entertainment"],
-    "Seasonality": ["Evergreen", "Summer", "Winter", "Black Friday", "Christmas", "Halloween", "Back to School", "Valentine’s Day", "April Fools", "Other Holidays"],
-    "Tone Alignment": ["Playful", "Premium Yet Fun", "Professional", "Luxury", "Edgy", "Trendy", "Nostalgic", "Corporate", "General"]
+    "Primary Audience": ["Gen Z", "Millennials", "Young Adults", "Parents", "Professionals", "Gamers", "Students", "General Public"],
+    "Humor Style": ["Sarcastic", "Wholesome", "Dark", "Witty", "Relatable", "Cringe", "Dry", "Absurd"]
 }
+
+
+def normalize_template_name(name):
+    return name.lower().replace(" ", "_").replace("-", "_").strip("_")
 
 
 def openai_call(meme_template_name, keywords_prompt, structured_inputs):
@@ -50,9 +46,7 @@ def openai_call(meme_template_name, keywords_prompt, structured_inputs):
 
     - Ensure the meme is funny for the target audience:  
       **Primary Audience:** {structured_inputs["primary_audience"]}  
-      **Secondary Audience:** {structured_inputs["secondary_audience"]}  
-      **Industry:** {structured_inputs["industry"]}  
-      **Emotion Targeted:** {structured_inputs["emotion_targeted"]}  
+      **Humor Style**: {structured_inputs["humor_style"]}
 
     - If relevant, use humor specific to **{user_input.location}**, including inside jokes, funny stereotypes, or pop culture references.
     - Make fun of **{user_input.location}** like an insider.  
@@ -94,23 +88,21 @@ def generate_meme_text(final_score_table, user_input_df, keywords_prompt):
 
     structured_inputs = {
         "primary_audience": user_row["Primary Audience"],
-        "secondary_audience": user_row["Secondary Audience"],
-        "industry": user_row["Industry"],
-        "product_service": user_row["Product/Service"],
-        "best_platforms": user_row["Best Platforms"],
         "humor_style": user_row["Humor Style"],
-        "emotion_targeted": user_row["Emotion Targeted"],
-        "engagement_type": user_row["Engagement Type"],
-        "tone_alignment": user_row["Tone Alignment"],
         "location": user_input.location
     }
 
     for _, row in final_score_table.iterrows():
         meme_template_name = row["Meme Name"]
-
         meme_text = openai_call(
             meme_template_name, keywords_prompt, structured_inputs)
 
-        meme_texts_dict[meme_template_name] = meme_text
+        normalized_name = normalize_template_name(meme_template_name)
+
+        # Save using normalized name for reliable lookup later
+        meme_texts_dict[normalized_name] = {
+            "display_name": meme_template_name,
+            "text": meme_text
+        }
 
     return meme_texts_dict
