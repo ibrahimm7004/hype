@@ -20,8 +20,8 @@ const FacebookCreatePost = ({ initialText = "", initialImage = "" }) => {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const file = new File([blob], "tweet-image.jpg", { type: blob.type });
-      setImage(URL.createObjectURL(blob));
-      setImageFile(file);
+      setImagePreview(URL.createObjectURL(blob));
+      setImageFile(file); // <-- Important
     } catch (error) {
       console.error("Error fetching image:", error);
     }
