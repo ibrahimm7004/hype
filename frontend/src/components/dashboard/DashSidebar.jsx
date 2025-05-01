@@ -68,6 +68,11 @@ const menuItems = [
     icon: <FaHome />,
     path: "/trends/sentiment-analyzer",
   },
+  {
+    name: "Top Trends",
+    icon: <FaHome />,
+    path: "/trends/top-trends",
+  },
 
   {
     name: "GIKI",

@@ -104,3 +104,42 @@ def reddit_trends():
         "topic": topic,
         "top_keywords": [{"word": word, "count": count} for word, count in top_keywords]
     })
+
+
+@trends_bp.route("/get-trends", methods=["POST"])
+def get_trends_endpoint():
+    # Extract parameters from query parameters
+    data = request.get_json()
+
+    social_media = data.get("social_media")
+    location = data.get("location")
+    trend_type = data.get("trend_type")
+    num = int(data.get("num", 10))  # Default to 10 if not provided
+
+    # Check for missing parameters
+    if not social_media or not location or not trend_type:
+        return jsonify({"error": "Missing required parameters: social_media, location, and trend_type."}), 400
+
+    try:
+        # Define the prompt
+        prompt = (
+            f"List the top {num} trending {trend_type} on {social_media} in {location} right now. "
+            f"Return only a comma-separated list, no explanation."
+        )
+
+        # Call OpenAI API to get the response
+        response = client.chat.completions.create(
+            model="gpt-4.1",
+            messages=[
+                {"role": "system", "content": "You are a trend analysis assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        # Process the response
+        raw_text = response.choices[0].message.content.strip()
+        trends = [trend.strip()[:40] for trend in raw_text.split(',') if trend.strip()]
+        return jsonify({"trends": trends[:num]})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

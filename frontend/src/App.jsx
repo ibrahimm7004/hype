@@ -37,6 +37,7 @@ import GikiCampaignPage from "./pages/GikiCampaignPage";
 import TrendsPage from "./pages/TrendsPage";
 import SentimentAnalyzer from "./components/trends/SentimentAnalyzer";
 import RedditTrends from "./components/trends/RedditTrends";
+import TrendFetcher from "./components/trends/TrendsFetcher";
 
 const App = () => (
   <BrowserRouter>
@@ -50,7 +51,8 @@ const App = () => (
       </Route>
 
       <Route path="trends" element={<DashboardLayout />}>
-        <Route path="" element={<TrendsPage />} />
+        {/* <Route path="" element={<TrendsPage />} /> */}
+        <Route path="top-trends" element={<TrendFetcher />} />
         <Route path="sentiment-analyzer" element={<SentimentAnalyzer />} />
         <Route path="keyword-searcher" element={<RedditTrends />} />
       </Route>

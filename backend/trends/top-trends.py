@@ -7,31 +7,35 @@ load_dotenv()
 client = openai.OpenAI(api_key=os.getenv("OPENAI_KEY"))
 
 
-def get_trending_trends(social_media: str, location: str, trend_type: str, num: int = 10) -> list:
-    # Create a natural prompt
+def get_trends(social_media: str, location: str, trend_type: str, num: int = 10) -> list:
     prompt = (
         f"List the top {num} trending {trend_type} on {social_media} in {location} right now. "
-        f"Only return a comma-separated list. No numbers, no explanation, no extra text."
+        f"Return only a comma-separated list, no explanation."
     )
 
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a social media trends analyst."},
-                {"role": "user", "content": prompt}
-            ]
-        )
+    response = client.responses.create(
+        model="gpt-4.1",
+        tools=[{
+            "type": "web_search_preview",
+            "user_location": {
+                "type": "approximate",
+                "country": location[:2].upper() if len(location) == 2 else "",
+            },
+            "search_context_size": "low"    # change to high after testing
+        }],
+        input=prompt,
+        tool_choice={"type": "web_search_preview"}
+    )
 
-        raw_text = response.choices[0].message.content.strip()
-        trends = [trend.strip() for trend in raw_text.split(',') if trend.strip()]
-        return trends[:num]
-
-    except Exception as e:
-        print("Error fetching trends:", e)
-        return []
+    raw_text = response.output_text.strip()
+    trends = [trend.strip()[:40]
+              for trend in raw_text.split(',') if trend.strip()]
+    return trends[:num]
 
 
-# Example usage
-if __name__ == "__main__":
-    print(get_trending_trends('instagram', 'Pakistan', 'news', 5))
+print(get_trends('instagram', 'Pakistan', 'news', 5))
+
+# trend_type: hastags, topics, memes, challenges, keywords, accounts, news
+# social_media: reddit, twitter, facebook, instagram
+# location: countries
+# num: give option 1-10

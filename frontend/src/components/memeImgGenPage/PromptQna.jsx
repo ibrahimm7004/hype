@@ -1,38 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const PromptQna = ({ setPromptQna, generatePostHandler }) => {
   const questions = [
-    // Step 1: Audience, Product & Industry
+    // Step 1: Audience
     [
       {
         id: "primary_audience",
         question: "Who is the primary target audience for the meme?",
         options: [
-          "Kids (Under 13)",
           "Teens (13-17)",
           "Young Adults (18-24)",
           "Millennials (25-34)",
-          "Adults (35-50)",
-          "Older Adults (50+)",
           "General Audience (All Ages)",
         ],
         type: "checkbox", // Single choice
       },
       {
         id: "secondary_audience",
-        question: "Who is the secondary target audience?",
+        question: "Secondary audience?",
         options: [
-          "None (Highly niche meme)",
+          "None",
           "Teens (13-17)",
           "Young Adults (18-24)",
           "Millennials (25-34)",
-          "Adults (35-50)",
-          "Older Adults (50+)",
           "General Audience (All Ages)",
-          "Professionals (Corporate/Workplace Humor)",
-          "Tech Enthusiasts (Niche Internet/Tech Culture)",
-          "Gamers (Gaming-Related Humor)",
-          "Pop Culture Fans (TV, Movies, Celebrities, Anime, etc.)",
         ],
         type: "checkbox", // Multi-choice
       },
@@ -44,16 +35,8 @@ const PromptQna = ({ setPromptQna, generatePostHandler }) => {
         question: "Which industry does the meme align with?",
         options: [
           "eCommerce",
-          "Fashion & Beauty",
-          "Food & Beverage",
           "Tech & Software",
-          "Finance & Banking",
-          "Healthcare & Wellness",
-          "Education & E-Learning",
-          "Entertainment & Media",
-          "Automotive",
-          "Travel & Hospitality",
-          "B2B & Corporate",
+          "Fashion & Beauty",
           "General (Works for multiple industries)",
         ],
         type: "dropdown", // Dropdown selection
@@ -64,15 +47,8 @@ const PromptQna = ({ setPromptQna, generatePostHandler }) => {
         options: [
           "Relatable",
           "Sarcastic",
-          "Wholesome",
-          "Dark Humor",
-          "Satirical",
           "Self-Deprecating",
           "Absurd/Random",
-          "Workplace/Corporate",
-          "Pop Culture Reference",
-          "Nostalgic",
-          "Reaction-Based",
         ],
         type: "checkbox", // Multi-choice
       },
@@ -83,60 +59,91 @@ const PromptQna = ({ setPromptQna, generatePostHandler }) => {
         id: "engagement_type",
         question: "What type of engagement does the meme encourage?",
         options: [
-          "Tag a Friend",
           "Shareable Joke",
-          "Call to Action (CTA)",
           "Comment Bait (Encourages Replies)",
           "Self-Identification ('This is so me')",
-          "Educational Awareness",
           "Controversial (Encourages Debate)",
-          "Nostalgic Engagement ('Remember this?')",
-          "General Entertainment (No Specific Engagement Focus)",
         ],
         type: "checkbox", // Multi-choice
       },
       {
         id: "emotion_targeted",
         question: "What emotion does the meme target?",
-        options: [
-          "FOMO (Fear of Missing Out)",
-          "Excitement",
-          "Regret",
-          "Confidence",
-          "Shock/Surprise",
-          "Confusion",
-          "Happiness/Joy",
-          "Frustration",
-          "Empowerment",
-          "Curiosity",
-        ],
+        options: ["Excitement", "Happiness/Joy", "Frustration", "Empowerment"],
         type: "checkbox", // Multi-choice
       },
       {
         id: "tone_alignment",
         question: "What type of brand tone does the meme align with?",
-        options: [
-          "Playful & Casual",
-          "Premium Yet Fun",
-          "Strictly Professional",
-          "Luxury & Exclusive",
-          "Edgy & Bold",
-          "Trendy & Youth-Focused",
-          "Nostalgic & Feel-Good",
-          "Corporate & Safe Humor",
-          "General (Fits Most Brands)",
-        ],
+        options: ["Playful & Casual", "Premium Yet Fun", "Edgy & Bold"],
         type: "checkbox", // Single choice
       },
     ],
+    // Step 4: New Fields - Location and Language
+    // [
+    //   {
+    //     id: "location",
+    //     question: "Where is the meme intended to be viewed?",
+    //     options: [
+    //       "United States",
+    //       "United Kingdom",
+    //       "Pakistan",
+    //       "India",
+    //       "Canada",
+    //       "Australia",
+    //       "Germany",
+    //       "France",
+    //       "Italy",
+    //       "Spain",
+    //       "Brazil",
+    //       "Mexico",
+    //       "South Korea",
+    //       "Japan",
+    //       "Russia",
+    //       "China",
+    //       "South Africa",
+    //       "Nigeria",
+    //       "Argentina",
+    //       "Italy",
+    //       "Nigeria",
+    //       "General (Global Audience)",
+    //     ],
+    //     type: "dropdown", // Dropdown selection
+    //   },
+    //   {
+    //     id: "language",
+    //     question: "What language is the meme in?",
+    //     options: [
+    //       "English",
+    //       "Spanish",
+    //       "Mandarin",
+    //       "Hindi",
+    //       "French",
+    //       "Arabic",
+    //       "Portuguese",
+    //       "Russian",
+    //       "Japanese",
+    //       "German",
+    //       "Italian",
+    //       "Korean",
+    //       "Bengali",
+    //       "Urdu",
+    //       "Turkish",
+    //       "Vietnamese",
+    //       "Polish",
+    //       "Dutch",
+    //       "Swedish",
+    //       "Greek",
+    //       "Other",
+    //     ],
+    //     type: "dropdown", // Dropdown selection
+    //   },
+    // ],
   ];
 
   const [step, setStep] = useState(0); // Track the current step
   const [answers, setAnswers] = useState({}); // Store the answers
 
-  useEffect(() => {
-    console.log(answers);
-  }, [answers]);
   const handleChange = (id, value) => {
     setPromptQna((prev) => ({ ...prev, [id]: value }));
     setAnswers((prev) => ({
@@ -191,23 +198,6 @@ const PromptQna = ({ setPromptQna, generatePostHandler }) => {
           <label className="block text-gray-700 font-medium mb-2">
             {q.question}
           </label>
-          {/* {q.type === "radio" && (
-            <div>
-              {q.options.map((option, index) => (
-                <div key={index}>
-                  <input
-                    type="radio"
-                    id={option}
-                    name={q.id}
-                    value={option}
-                    onChange={(e) => handleChange(q.id, e.target.value)}
-                    checked={answers[q.id] === option}
-                  />
-                  <label className="ml-2">{option}</label>
-                </div>
-              ))}
-            </div>
-          )} */}
 
           {q.type === "checkbox" && (
             <div>
